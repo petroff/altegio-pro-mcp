@@ -218,6 +218,6 @@ curl https://altegio-mcp.web.app/tools
 
 ## Support
 
-- GitHub: [petroff/altegio-mcp](https://github.com/petroff/altegio-mcp)
-- Issues: [GitHub Issues](https://github.com/petroff/altegio-mcp/issues)
+- GitHub: [petroff/altegio-pro-mcp](https://github.com/petroff/altegio-pro-mcp)
+- Issues: [GitHub Issues](https://github.com/petroff/altegio-pro-mcp/issues)
 - Altegio Support: [support.alteg.io](https://support.alteg.io)

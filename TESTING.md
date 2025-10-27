@@ -147,5 +147,5 @@ See [CLAUDE_DESKTOP_SETUP.md](CLAUDE_DESKTOP_SETUP.md) for integration instructi
 
 ## Support
 
-- **Issues**: https://github.com/petroff/altegio-mcp/issues
+- **Issues**: https://github.com/petroff/altegio-pro-mcp/issues
 - **API Docs**: https://developer.alteg.io

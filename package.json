@@ -17,13 +17,13 @@
     "llm",
     "claude"
   ],
-  "homepage": "https://github.com/petroff/altegio-mcp#readme",
+  "homepage": "https://github.com/petroff/altegio-pro-mcp#readme",
   "bugs": {
-    "url": "https://github.com/petroff/altegio-mcp/issues"
+    "url": "https://github.com/petroff/altegio-pro-mcp/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/petroff/altegio-mcp.git"
+    "url": "git+https://github.com/petroff/altegio-pro-mcp.git"
   },
   "license": "MIT",
   "author": {

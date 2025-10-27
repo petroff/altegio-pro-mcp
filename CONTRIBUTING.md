@@ -207,7 +207,7 @@ See [CI-CD.md](CI-CD.md) for details.
 ## Questions?
 
 - Open an issue for general questions
-- Check [GitHub Discussions](https://github.com/petroff/altegio-mcp/discussions)
+- Check [GitHub Discussions](https://github.com/petroff/altegio-pro-mcp/discussions)
 - Review existing documentation
 
 ## Recognition

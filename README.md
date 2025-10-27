@@ -42,7 +42,7 @@ MCP server for Altegio.Pro business management API - B2B integration for salon/s
 ### Installation
 
 ```bash
-git clone https://github.com/petroff/altegio-mcp.git
+git clone https://github.com/petroff/altegio-pro-mcp.git
 cd altegio-mcp
 npm install
 cp .env.example .env
@@ -164,8 +164,8 @@ MIT License - see [LICENSE](LICENSE) file
 
 ## Support
 
-- **Issues:** [GitHub Issues](https://github.com/petroff/altegio-mcp/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/petroff/altegio-mcp/discussions)
+- **Issues:** [GitHub Issues](https://github.com/petroff/altegio-pro-mcp/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/petroff/altegio-pro-mcp/discussions)
 - **Altegio API:** [support.alteg.io](https://support.alteg.io)
 
 ## Acknowledgments

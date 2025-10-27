@@ -7,7 +7,7 @@ This guide shows how to integrate Altegio.Pro MCP server with Claude Desktop.
 ### Step 1: Clone and Build
 
 ```bash
-git clone https://github.com/petroff/altegio-mcp.git
+git clone https://github.com/petroff/altegio-pro-mcp.git
 cd altegio-mcp
 npm install
 npm run build
@@ -68,7 +68,7 @@ If you deployed MCP server to Cloud Run, connect via bridge:
 ### Step 1: Download Bridge
 
 ```bash
-curl -O https://raw.githubusercontent.com/petroff/altegio-mcp/main/docker-bridge.cjs
+curl -O https://raw.githubusercontent.com/petroff/altegio-pro-mcp/main/docker-bridge.cjs
 ```
 
 ### Step 2: Configure
@@ -96,7 +96,7 @@ curl -O https://raw.githubusercontent.com/petroff/altegio-mcp/main/docker-bridge
 ```bash
 # Clone and build
 cd ~/Developer
-git clone https://github.com/petroff/altegio-mcp.git
+git clone https://github.com/petroff/altegio-pro-mcp.git
 cd altegio-mcp
 npm install
 npm run build
@@ -132,7 +132,7 @@ Add to config (replace YOUR_USERNAME and YOUR_TOKEN):
 ```powershell
 # Clone and build
 cd C:\Users\%USERNAME%\Documents
-git clone https://github.com/petroff/altegio-mcp.git
+git clone https://github.com/petroff/altegio-pro-mcp.git
 cd altegio-mcp
 npm install
 npm run build
@@ -269,6 +269,6 @@ In Claude Desktop, try:
 
 ## Support
 
-- **Issues**: https://github.com/petroff/altegio-mcp/issues
+- **Issues**: https://github.com/petroff/altegio-pro-mcp/issues
 - **Docs**: See [README.md](README.md) and [TESTING.md](TESTING.md)
 - **API**: https://developer.alteg.io

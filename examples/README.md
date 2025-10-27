@@ -174,6 +174,6 @@ Optional:
 
 ## Need Help?
 
-- [Documentation](https://github.com/petroff/altegio-mcp)
-- [Issues](https://github.com/petroff/altegio-mcp/issues)
-- [Discussions](https://github.com/petroff/altegio-mcp/discussions)
+- [Documentation](https://github.com/petroff/altegio-pro-mcp)
+- [Issues](https://github.com/petroff/altegio-pro-mcp/issues)
+- [Discussions](https://github.com/petroff/altegio-pro-mcp/discussions)

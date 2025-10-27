@@ -1,0 +1,65 @@
+# Cloud Build configuration for automatic deployment
+# Triggered on push to main branch
+#
+# CUSTOMIZE:
+# - Line 10, 12, 21, 32, 55-56: Replace 'altegio-mcp' with your Artifact Registry repo name
+# - Line 31: Replace 'altegio-mcp-staging' with your Cloud Run service name
+# - Line 33: Adjust region if needed (default: us-central1)
+# - Line 37: Replace 'altegio-api-token' with your Secret Manager secret name
+
+steps:
+  # Step 1: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server:$SHORT_SHA'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server:latest'
+      - '.'
+    id: 'build-image'
+
+  # Step 2: Push image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server'
+    id: 'push-image'
+    waitFor: ['build-image']
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'altegio-mcp-staging'
+      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server:$SHORT_SHA'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars=NODE_ENV=production,LOG_LEVEL=info'
+      - '--update-secrets=ALTEGIO_API_TOKEN=altegio-api-token:latest'
+      - '--memory=512Mi'
+      - '--cpu=1'
+      - '--max-instances=10'
+      - '--min-instances=0'
+      - '--timeout=3600'
+      - '--no-cpu-throttling'
+      - '--session-affinity'
+    id: 'deploy-cloud-run'
+    waitFor: ['push-image']
+
+# Build configuration
+options:
+  machineType: 'N1_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
+
+# Store images
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server:$SHORT_SHA'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server:latest'
+
+# Timeout
+timeout: '1200s'

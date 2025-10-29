@@ -15,7 +15,8 @@ export class CredentialManager {
         this.logger = createLogger('credential-manager');
         this.credentialsDir = customDir || join(homedir(), '.altegio-mcp');
         this.credentialsFile = join(this.credentialsDir, 'credentials.json');
-        this.encryptionKey = encryptionKey || process.env.CREDENTIALS_ENCRYPTION_KEY;
+        this.encryptionKey =
+            encryptionKey || process.env.CREDENTIALS_ENCRYPTION_KEY;
     }
     /**
      * Ensure credentials directory exists with proper permissions

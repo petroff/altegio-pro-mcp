@@ -47,3 +47,9 @@ ui-debug.log
 # Git worktrees
 .worktrees/
 .worktrees/
+
+# Corporate OpenAPI specs (not for open source)
+api.docs/
+
+# Build output
+dist/

@@ -11,8 +11,12 @@ export const EnvSchema = z.object({
     ALTEGIO_USER_TOKEN: z.string().optional(),
     ALTEGIO_API_BASE: z.string().url().default('https://api.alteg.io/api/v1'),
     // Server config
-    NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-    LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+    NODE_ENV: z
+        .enum(['development', 'production', 'test'])
+        .default('development'),
+    LOG_LEVEL: z
+        .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace'])
+        .default('info'),
     // Credentials storage
     CREDENTIALS_DIR: z.string().optional(),
     // Rate limiting
@@ -29,17 +33,25 @@ export const ServerConfigSchema = z.object({
     version: z.string().default('1.0.0'),
     description: z.string().optional(),
     protocolVersion: z.string().default('2024-11-05'),
-    capabilities: z.object({
-        tools: z.object({
+    capabilities: z
+        .object({
+        tools: z
+            .object({
             listChanged: z.boolean().default(true),
-        }).optional(),
-        prompts: z.object({
+        })
+            .optional(),
+        prompts: z
+            .object({
             listChanged: z.boolean().default(true),
-        }).optional(),
-        resources: z.object({
+        })
+            .optional(),
+        resources: z
+            .object({
             listChanged: z.boolean().default(true),
-        }).optional(),
-    }).default({
+        })
+            .optional(),
+    })
+        .default({
         tools: { listChanged: true },
         prompts: { listChanged: true },
     }),
@@ -50,15 +62,19 @@ export const AltegioConfigSchema = z.object({
     partnerToken: z.string().min(1),
     userToken: z.string().optional(),
     timeout: z.number().min(1000).default(30000),
-    retryConfig: z.object({
+    retryConfig: z
+        .object({
         maxAttempts: z.number().min(0).default(3),
         initialDelay: z.number().min(100).default(1000),
         maxDelay: z.number().min(1000).default(30000),
-    }).default({}),
-    rateLimit: z.object({
+    })
+        .default({}),
+    rateLimit: z
+        .object({
         requests: z.number().min(1).default(200),
         windowMs: z.number().min(1000).default(60000),
-    }).default({}),
+    })
+        .default({}),
 });
 // Full application configuration
 export const AppConfigSchema = z.object({
@@ -132,7 +148,7 @@ export class ConfigLoader {
         }
         catch (error) {
             if (error instanceof z.ZodError) {
-                const errors = error.errors.map(e => `${e.path.join('.')}: ${e.message}`);
+                const errors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`);
                 throw new ConfigurationError(`Configuration validation failed:\n${errors.join('\n')}`);
             }
             throw error;

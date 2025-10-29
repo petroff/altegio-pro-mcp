@@ -27,7 +27,7 @@ process.on('SIGTERM', () => {
 });
 // Run if executed directly (not when imported by tests)
 if (process.argv[1] && !process.argv[1].includes('jest')) {
-    main().catch(error => {
+    main().catch((error) => {
         console.error('Fatal error:', error);
         process.exit(1);
     });

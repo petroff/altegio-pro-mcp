@@ -7,6 +7,18 @@ MCP (Model Context Protocol) server for Altegio.Pro business management API.
 - **Tech**: TypeScript, @modelcontextprotocol/sdk, Express for HTTP mode
 - **Package**: `@altegio/mcp-server-pro` (not published to npm)
 
+## Workflow
+
+**Before starting ANY new task:**
+
+1. **Pull latest OpenAPI spec:**
+   ```bash
+   git -C api.docs pull origin master
+   ```
+2. **Check OpenAPI spec first:** `api.docs/docs/altegio/en/openapi.yml`
+3. **NEVER modify `api.docs/`** - read-only submodule (managed in separate GitLab repo)
+4. **Read Product logic** - `docs/*.md`
+
 ## Quick Start
 
 **Tech Stack:** TypeScript, @modelcontextprotocol/sdk, Express (HTTP mode), Jest
@@ -107,7 +119,9 @@ MCP server for **B2B business management only** (Altegio.Pro, not public booking
 ### API Reference
 
 **Base URL:** `https://api.alteg.io/api/v1`
-**Docs:** https://developer.alteg.io/api (also cached at `/tmp/alteg_api.html`)
+**Docs:**
+- Online: https://developer.alteg.io/api (cached at `/tmp/alteg_api.html`)
+- **OpenAPI Spec (corporate):** `api.docs/docs/altegio/en/openapi.yml` (see OPENAPI.md for setup)
 
 **B2B Endpoints (require user_token):**
 - `GET /staff/{company_id}` - staff with admin details
@@ -177,3 +191,4 @@ MAX_RETRY_ATTEMPTS=3
 - `CLAUDE_DESKTOP_SETUP.md` - local Claude Desktop setup
 - `TESTING.md` - testing guide
 - `OPENAI_PLATFORM.md` - OpenAI/ChatGPT integration
+- `OPENAPI.md` - OpenAPI specification setup (corporate)

@@ -31,7 +31,15 @@ describe('Tool Registration', () => {
     expect(toolNames).toContain('get_services');
     expect(toolNames).toContain('get_service_categories');
     expect(toolNames).toContain('get_schedule');
-    expect(toolNames.length).toBe(8);
+    expect(toolNames).toContain('create_staff');
+    expect(toolNames).toContain('update_staff');
+    expect(toolNames).toContain('delete_staff');
+    expect(toolNames).toContain('create_service');
+    expect(toolNames).toContain('update_service');
+    expect(toolNames).toContain('create_booking');
+    expect(toolNames).toContain('update_booking');
+    expect(toolNames).toContain('delete_booking');
+    expect(toolNames.length).toBe(16);
   });
 
   it('should create server with tools', () => {

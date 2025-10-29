@@ -173,6 +173,9 @@ export interface CreateStaffRequest {
     specialization: string;
     position_id: number | null;
     phone_number: string | null;
+    user_email: string;
+    user_phone: string;
+    is_user_invite: number;
 }
 export interface UpdateStaffRequest {
     name?: string;

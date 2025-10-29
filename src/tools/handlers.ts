@@ -36,6 +36,9 @@ const CreateStaffSchema = z.object({
   specialization: z.string().min(1),
   position_id: z.number().int().positive().nullable(),
   phone_number: z.string().nullable(),
+  user_email: z.string().email(),
+  user_phone: z.string().min(1),
+  is_user_invite: z.number().int().min(0).max(1),
 });
 
 const UpdateStaffSchema = z.object({

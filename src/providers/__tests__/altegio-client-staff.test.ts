@@ -36,6 +36,9 @@ describe('AltegioClient - Staff CRUD', () => {
         specialization: 'Stylist',
         position_id: 1,
         phone_number: '1234567890',
+        user_email: 'john@example.com',
+        user_phone: '1234567890',
+        is_user_invite: 1,
       });
 
       expect(result.id).toBe(123);
@@ -62,6 +65,9 @@ describe('AltegioClient - Staff CRUD', () => {
           specialization: 'Stylist',
           position_id: 1,
           phone_number: '123',
+          user_email: 'john@example.com',
+          user_phone: '1234567890',
+          is_user_invite: 1,
         })
       ).rejects.toThrow('Not authenticated');
     });

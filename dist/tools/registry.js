@@ -161,7 +161,7 @@ const tools = [
     },
     {
         name: 'create_staff',
-        description: 'Create a new employee/staff member. AUTHENTICATION REQUIRED. Required fields: name, specialization, position_id, phone_number.',
+        description: 'Create a new employee/staff member. AUTHENTICATION REQUIRED. Required fields: name, specialization, position_id, phone_number, user_email, user_phone, is_user_invite.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -178,8 +178,20 @@ const tools = [
                     description: 'Phone number (without +, 9-15 digits)',
                     nullable: true,
                 },
+                user_email: {
+                    type: 'string',
+                    description: 'User email address',
+                },
+                user_phone: {
+                    type: 'string',
+                    description: 'User phone number',
+                },
+                is_user_invite: {
+                    type: 'number',
+                    description: 'User invitation flag (0 or 1)',
+                },
             },
-            required: ['company_id', 'name', 'specialization', 'position_id', 'phone_number'],
+            required: ['company_id', 'name', 'specialization', 'position_id', 'phone_number', 'user_email', 'user_phone', 'is_user_invite'],
         },
     },
     {

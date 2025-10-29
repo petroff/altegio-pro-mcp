@@ -27,6 +27,9 @@ describe('ToolHandlers - Staff CRUD', () => {
         specialization: 'Stylist',
         position_id: 1,
         phone_number: '1234567890',
+        user_email: 'john@example.com',
+        user_phone: '1234567890',
+        is_user_invite: 1,
       });
 
       expect((result.content[0] as any).text).toContain('Successfully created staff');
@@ -36,6 +39,9 @@ describe('ToolHandlers - Staff CRUD', () => {
         specialization: 'Stylist',
         position_id: 1,
         phone_number: '1234567890',
+        user_email: 'john@example.com',
+        user_phone: '1234567890',
+        is_user_invite: 1,
       });
     });
 
@@ -50,6 +56,9 @@ describe('ToolHandlers - Staff CRUD', () => {
         specialization: 'Stylist',
         position_id: 1,
         phone_number: '123',
+        user_email: 'john@example.com',
+        user_phone: '1234567890',
+        is_user_invite: 1,
       });
 
       expect((result.content[0] as any).text).toContain('Failed to create staff');

@@ -148,7 +148,9 @@ export function toMCPError(error) {
             stack: error.stack,
         });
     }
-    return new MCPError('An unknown error occurred', ErrorCode.InternalError, { error });
+    return new MCPError('An unknown error occurred', ErrorCode.InternalError, {
+        error,
+    });
 }
 /**
  * Error handler utility

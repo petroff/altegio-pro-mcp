@@ -197,6 +197,209 @@ const tools: ToolDefinition[] = [
       required: ['company_id', 'staff_id', 'start_date', 'end_date'],
     },
   },
+  {
+    name: 'create_staff',
+    description:
+      'Create a new employee/staff member. AUTHENTICATION REQUIRED. Required fields: name, specialization, position_id, phone_number, user_email, user_phone, is_user_invite.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'Company ID' },
+        name: { type: 'string', description: 'Employee name' },
+        specialization: { type: 'string', description: 'Employee specialization' },
+        position_id: {
+          type: 'number',
+          description: 'Position ID',
+          nullable: true,
+        },
+        phone_number: {
+          type: 'string',
+          description: 'Phone number (without +, 9-15 digits)',
+          nullable: true,
+        },
+        user_email: {
+          type: 'string',
+          description: 'User email address',
+        },
+        user_phone: {
+          type: 'string',
+          description: 'User phone number',
+        },
+        is_user_invite: {
+          type: 'boolean',
+          description: 'User invitation flag',
+        },
+      },
+      required: ['company_id', 'name', 'specialization', 'position_id', 'phone_number', 'user_email', 'user_phone', 'is_user_invite'],
+    },
+  },
+  {
+    name: 'update_staff',
+    description:
+      'Update existing employee/staff member. AUTHENTICATION REQUIRED. Provide only fields to update.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'Company ID' },
+        staff_id: { type: 'number', description: 'Staff member ID' },
+        name: { type: 'string', description: 'Employee name' },
+        specialization: { type: 'string', description: 'Employee specialization' },
+        position_id: { type: 'number', description: 'Position ID', nullable: true },
+        phone_number: { type: 'string', description: 'Phone number', nullable: true },
+        hidden: { type: 'number', description: '0 or 1' },
+        fired: { type: 'number', description: '0 or 1' },
+      },
+      required: ['company_id', 'staff_id'],
+    },
+  },
+  {
+    name: 'delete_staff',
+    description:
+      'Delete/remove employee/staff member. AUTHENTICATION REQUIRED.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'Company ID' },
+        staff_id: { type: 'number', description: 'Staff member ID to delete' },
+      },
+      required: ['company_id', 'staff_id'],
+    },
+  },
+  {
+    name: 'create_service',
+    description:
+      'Create a new service. AUTHENTICATION REQUIRED. Required fields: title, category_id.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'Company ID' },
+        title: { type: 'string', description: 'Service title' },
+        category_id: { type: 'number', description: 'Service category ID' },
+        price_min: { type: 'number', description: 'Minimum price' },
+        price_max: { type: 'number', description: 'Maximum price' },
+        discount: { type: 'number', description: 'Discount percentage' },
+        comment: { type: 'string', description: 'Service description' },
+        duration: { type: 'number', description: 'Duration in seconds' },
+        prepaid: { type: 'string', description: 'Prepaid option' },
+      },
+      required: ['company_id', 'title', 'category_id'],
+    },
+  },
+  {
+    name: 'update_service',
+    description:
+      'Update existing service. AUTHENTICATION REQUIRED. Provide only fields to update.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'Company ID' },
+        service_id: { type: 'number', description: 'Service ID' },
+        title: { type: 'string', description: 'Service title' },
+        category_id: { type: 'number', description: 'Service category ID' },
+        price_min: { type: 'number', description: 'Minimum price' },
+        price_max: { type: 'number', description: 'Maximum price' },
+        discount: { type: 'number', description: 'Discount percentage' },
+        comment: { type: 'string', description: 'Service description' },
+        duration: { type: 'number', description: 'Duration in seconds' },
+        active: { type: 'number', description: '0 or 1' },
+      },
+      required: ['company_id', 'service_id'],
+    },
+  },
+  {
+    name: 'create_booking',
+    description:
+      'Create a new client booking/appointment. AUTHENTICATION REQUIRED. Required fields: staff_id, services, datetime, client info.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'Company ID' },
+        staff_id: { type: 'number', description: 'Staff member ID' },
+        services: {
+          type: 'array',
+          description: 'Array of service objects',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'number', description: 'Service ID' },
+              amount: { type: 'number', description: 'Amount/quantity' },
+            },
+            required: ['id'],
+          },
+        },
+        datetime: {
+          type: 'string',
+          description: 'Booking datetime (ISO format: YYYY-MM-DDTHH:MM:SS)',
+        },
+        seance_length: { type: 'number', description: 'Session length in seconds' },
+        client: {
+          type: 'object',
+          description: 'Client information',
+          properties: {
+            name: { type: 'string', description: 'Client name' },
+            phone: { type: 'string', description: 'Client phone' },
+            email: { type: 'string', description: 'Client email' },
+          },
+          required: ['name', 'phone'],
+        },
+        comment: { type: 'string', description: 'Booking comment' },
+        send_sms: { type: 'number', description: 'Send SMS reminder (0 or 1)' },
+        attendance: { type: 'number', description: 'Attendance status' },
+      },
+      required: ['company_id', 'staff_id', 'services', 'datetime', 'client'],
+    },
+  },
+  {
+    name: 'update_booking',
+    description:
+      'Update existing booking/appointment. AUTHENTICATION REQUIRED. Provide only fields to update.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'Company ID' },
+        record_id: { type: 'number', description: 'Booking/record ID' },
+        staff_id: { type: 'number', description: 'Staff member ID' },
+        services: {
+          type: 'array',
+          description: 'Array of service objects',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'number', description: 'Service ID' },
+              amount: { type: 'number', description: 'Amount/quantity' },
+            },
+          },
+        },
+        datetime: { type: 'string', description: 'New booking datetime' },
+        seance_length: { type: 'number', description: 'Session length in seconds' },
+        client: {
+          type: 'object',
+          description: 'Client information',
+          properties: {
+            name: { type: 'string', description: 'Client name' },
+            phone: { type: 'string', description: 'Client phone' },
+            email: { type: 'string', description: 'Client email' },
+          },
+        },
+        comment: { type: 'string', description: 'Booking comment' },
+        attendance: { type: 'number', description: 'Attendance status' },
+      },
+      required: ['company_id', 'record_id'],
+    },
+  },
+  {
+    name: 'delete_booking',
+    description:
+      'Delete/cancel booking/appointment. AUTHENTICATION REQUIRED.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'Company ID' },
+        record_id: { type: 'number', description: 'Booking/record ID to delete' },
+      },
+      required: ['company_id', 'record_id'],
+    },
+  },
 ];
 
 export function registerTools(server: Server, client: AltegioClient): string[] {
@@ -235,6 +438,22 @@ export function registerTools(server: Server, client: AltegioClient): string[] {
           return await handlers.getServiceCategories(args);
         case 'get_schedule':
           return await handlers.getSchedule(args);
+        case 'create_staff':
+          return await handlers.createStaff(args);
+        case 'update_staff':
+          return await handlers.updateStaff(args);
+        case 'delete_staff':
+          return await handlers.deleteStaff(args);
+        case 'create_service':
+          return await handlers.createService(args);
+        case 'update_service':
+          return await handlers.updateService(args);
+        case 'create_booking':
+          return await handlers.createBooking(args);
+        case 'update_booking':
+          return await handlers.updateBooking(args);
+        case 'delete_booking':
+          return await handlers.deleteBooking(args);
         default:
           throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
       }

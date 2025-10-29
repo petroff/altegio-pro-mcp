@@ -300,4 +300,239 @@ export class AltegioClient {
 
     throw new Error(result.meta?.message || 'Failed to fetch schedule');
   }
+
+  // ========== Staff CRUD Operations ==========
+
+  async createStaff(
+    companyId: number,
+    data: import('../types/altegio.types.js').CreateStaffRequest
+  ): Promise<AltegioStaff> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(
+      `/company/${companyId}/staff/quick`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to create staff: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioStaff>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to create staff: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  async updateStaff(
+    companyId: number,
+    staffId: number,
+    data: import('../types/altegio.types.js').UpdateStaffRequest
+  ): Promise<AltegioStaff> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/staff/${companyId}/${staffId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to update staff: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioStaff>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to update staff: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  async deleteStaff(companyId: number, staffId: number): Promise<void> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/staff/${companyId}/${staffId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to delete staff: HTTP ${response.status} - ${errorText}`
+      );
+    }
+  }
+
+  // ========== Services CRUD Operations ==========
+
+  async createService(
+    companyId: number,
+    data: import('../types/altegio.types.js').CreateServiceRequest
+  ): Promise<AltegioService> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/services/${companyId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to create service: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioService>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to create service: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  async updateService(
+    companyId: number,
+    serviceId: number,
+    data: import('../types/altegio.types.js').UpdateServiceRequest
+  ): Promise<AltegioService> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(
+      `/services/${companyId}/services/${serviceId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to update service: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioService>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to update service: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  // ========== Bookings CRUD Operations ==========
+
+  async createBooking(
+    companyId: number,
+    data: import('../types/altegio.types.js').CreateBookingRequest
+  ): Promise<AltegioBooking> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/records/${companyId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to create booking: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioBooking>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to create booking: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  async updateBooking(
+    companyId: number,
+    recordId: number,
+    data: import('../types/altegio.types.js').UpdateBookingRequest
+  ): Promise<AltegioBooking> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/record/${companyId}/${recordId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to update booking: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioBooking>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to update booking: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  async deleteBooking(companyId: number, recordId: number): Promise<void> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/record/${companyId}/${recordId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to delete booking: HTTP ${response.status} - ${errorText}`
+      );
+    }
+  }
 }

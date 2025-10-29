@@ -8,9 +8,9 @@ export function createServer() {
     const config = loadConfig();
     const server = new Server({
         name: config.server.name,
-        version: config.server.version
+        version: config.server.version,
     }, {
-        capabilities: config.server.capabilities
+        capabilities: config.server.capabilities,
     });
     server.name = config.server.name;
     server.version = config.server.version;
@@ -18,7 +18,7 @@ export function createServer() {
     const altegioClient = new AltegioClient({
         apiBase: config.altegio.apiBase,
         partnerToken: config.altegio.partnerToken,
-        userToken: config.altegio.userToken
+        userToken: config.altegio.userToken,
     });
     // Register tools with client
     registerTools(server, altegioClient);

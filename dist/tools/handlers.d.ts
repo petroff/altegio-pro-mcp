@@ -50,5 +50,53 @@ export declare class ToolHandlers {
             text: string;
         }[];
     }>;
+    createStaff(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+    }>;
+    updateStaff(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+    }>;
+    deleteStaff(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+    }>;
+    createService(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+    }>;
+    updateService(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+    }>;
+    createBooking(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+    }>;
+    updateBooking(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+    }>;
+    deleteBooking(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+    }>;
 }
 //# sourceMappingURL=handlers.d.ts.map

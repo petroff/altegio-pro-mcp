@@ -77,7 +77,7 @@ process.on('SIGTERM', () => {
 });
 // Run if executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-    startHTTPServer().catch(error => {
+    startHTTPServer().catch((error) => {
         logger.error('Failed to start HTTP server', error);
         process.exit(1);
     });

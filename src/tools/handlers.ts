@@ -54,6 +54,32 @@ const DeleteStaffSchema = z.object({
   staff_id: z.number().int().positive(),
 });
 
+// ========== Services CRUD Schemas ==========
+const CreateServiceSchema = z.object({
+  company_id: z.number().int().positive(),
+  title: z.string().min(1),
+  category_id: z.number().int().positive(),
+  price_min: z.number().nonnegative().optional(),
+  price_max: z.number().nonnegative().optional(),
+  discount: z.number().nonnegative().optional(),
+  comment: z.string().optional(),
+  duration: z.number().positive().optional(),
+  prepaid: z.string().optional(),
+});
+
+const UpdateServiceSchema = z.object({
+  company_id: z.number().int().positive(),
+  service_id: z.number().int().positive(),
+  title: z.string().min(1).optional(),
+  category_id: z.number().int().positive().optional(),
+  price_min: z.number().nonnegative().optional(),
+  price_max: z.number().nonnegative().optional(),
+  discount: z.number().nonnegative().optional(),
+  comment: z.string().optional(),
+  duration: z.number().positive().optional(),
+  active: z.number().int().min(0).max(1).optional(),
+});
+
 export class ToolHandlers {
   constructor(private client: AltegioClient) {}
 
@@ -335,6 +361,66 @@ export class ToolHandlers {
           {
             type: 'text' as const,
             text: `Failed to delete staff: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+      };
+    }
+  }
+
+  // ========== Services CRUD Operations ==========
+
+  async createService(args: unknown) {
+    try {
+      const params = CreateServiceSchema.parse(args);
+      const { company_id, ...serviceData } = params;
+
+      const service = await this.client.createService(company_id, serviceData);
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully created service:\nID: ${service.id}\nTitle: ${service.title}\nCategory: ${service.category_id}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to create service: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+      };
+    }
+  }
+
+  async updateService(args: unknown) {
+    try {
+      const params = UpdateServiceSchema.parse(args);
+      const { company_id, service_id, ...updateData } = params;
+
+      const service = await this.client.updateService(
+        company_id,
+        service_id,
+        updateData
+      );
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully updated service ${service_id}:\nTitle: ${service.title}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to update service: ${error instanceof Error ? error.message : 'Unknown error'}`,
           },
         ],
       };

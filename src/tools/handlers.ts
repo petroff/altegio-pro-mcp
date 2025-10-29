@@ -234,7 +234,7 @@ export class ToolHandlers {
         (s, idx) =>
           `${idx + 1}. ID: ${s.id} - ${s.name}\n` +
           `   Specialization: ${s.specialization || 'N/A'}\n` +
-          `   Rating: ${s.rating !== undefined ? s.rating : 'N/A'}${s.position?.title ? `\n   Position: ${s.position.title}` : ''}`
+          `   Rating: ${s.rating !== undefined ? s.rating : 'N/A'}${s.position?.title ? `\n   Position: ${s.position.title} (ID: ${s.position.id})` : ''}`
       )
       .join('\n\n');
 

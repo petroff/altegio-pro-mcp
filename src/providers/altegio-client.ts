@@ -300,4 +300,89 @@ export class AltegioClient {
 
     throw new Error(result.meta?.message || 'Failed to fetch schedule');
   }
+
+  // ========== Staff CRUD Operations ==========
+
+  async createStaff(
+    companyId: number,
+    data: import('../types/altegio.types.js').CreateStaffRequest
+  ): Promise<AltegioStaff> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(
+      `/api/location/staff/create_quick?company_id=${companyId}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to create staff: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioStaff>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to create staff: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  async updateStaff(
+    companyId: number,
+    staffId: number,
+    data: import('../types/altegio.types.js').UpdateStaffRequest
+  ): Promise<AltegioStaff> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/staff/${companyId}/${staffId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to update staff: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioStaff>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to update staff: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  async deleteStaff(companyId: number, staffId: number): Promise<void> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/staff/${companyId}/${staffId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to delete staff: HTTP ${response.status} - ${errorText}`
+      );
+    }
+  }
 }

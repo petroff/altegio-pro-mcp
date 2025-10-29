@@ -385,4 +385,72 @@ export class AltegioClient {
       );
     }
   }
+
+  // ========== Services CRUD Operations ==========
+
+  async createService(
+    companyId: number,
+    data: import('../types/altegio.types.js').CreateServiceRequest
+  ): Promise<AltegioService> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/services/${companyId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to create service: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioService>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to create service: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  async updateService(
+    companyId: number,
+    serviceId: number,
+    data: import('../types/altegio.types.js').UpdateServiceRequest
+  ): Promise<AltegioService> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(
+      `/services/${companyId}/services/${serviceId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to update service: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioService>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to update service: Invalid response');
+    }
+
+    return result.data;
+  }
 }

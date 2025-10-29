@@ -40,7 +40,7 @@ describe('AltegioClient - Staff CRUD', () => {
 
       expect(result.id).toBe(123);
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/location/staff/create_quick'),
+        expect.stringContaining('/company/456/staff/quick'),
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({

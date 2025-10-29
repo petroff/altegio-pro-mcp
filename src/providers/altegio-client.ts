@@ -312,7 +312,7 @@ export class AltegioClient {
     }
 
     const response = await this.apiRequest(
-      `/api/location/staff/create_quick?company_id=${companyId}`,
+      `/company/${companyId}/staff/quick`,
       {
         method: 'POST',
         headers: {

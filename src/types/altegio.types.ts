@@ -185,3 +185,75 @@ export interface AltegioScheduleEntry {
   seance_length: number;
   datetime: string;
 }
+
+// ========== Write Operation Request Types ==========
+
+// Staff
+export interface CreateStaffRequest {
+  name: string;
+  specialization: string;
+  position_id: number | null;
+  phone_number: string | null;
+}
+
+export interface UpdateStaffRequest {
+  name?: string;
+  specialization?: string;
+  position_id?: number | null;
+  phone_number?: string | null;
+  hidden?: number;
+  fired?: number;
+}
+
+// Services
+export interface CreateServiceRequest {
+  title: string;
+  category_id: number;
+  price_min?: number;
+  price_max?: number;
+  discount?: number;
+  comment?: string;
+  duration?: number;
+  prepaid?: string;
+}
+
+export interface UpdateServiceRequest {
+  title?: string;
+  category_id?: number;
+  price_min?: number;
+  price_max?: number;
+  discount?: number;
+  comment?: string;
+  duration?: number;
+  active?: number;
+}
+
+// Bookings
+export interface CreateBookingRequest {
+  staff_id: number;
+  services: Array<{ id: number; amount?: number }>;
+  datetime: string;
+  seance_length?: number;
+  client: {
+    name: string;
+    phone: string;
+    email?: string;
+  };
+  comment?: string;
+  send_sms?: number;
+  attendance?: number;
+}
+
+export interface UpdateBookingRequest {
+  staff_id?: number;
+  services?: Array<{ id: number; amount?: number }>;
+  datetime?: string;
+  seance_length?: number;
+  client?: {
+    name?: string;
+    phone?: string;
+    email?: string;
+  };
+  comment?: string;
+  attendance?: number;
+}

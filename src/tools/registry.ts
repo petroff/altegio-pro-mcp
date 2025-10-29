@@ -226,8 +226,8 @@ const tools: ToolDefinition[] = [
           description: 'User phone number',
         },
         is_user_invite: {
-          type: 'number',
-          description: 'User invitation flag (0 or 1)',
+          type: 'boolean',
+          description: 'User invitation flag',
         },
       },
       required: ['company_id', 'name', 'specialization', 'position_id', 'phone_number', 'user_email', 'user_phone', 'is_user_invite'],

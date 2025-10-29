@@ -38,7 +38,7 @@ const CreateStaffSchema = z.object({
   phone_number: z.string().nullable(),
   user_email: z.string().email(),
   user_phone: z.string().min(1),
-  is_user_invite: z.number().int().min(0).max(1),
+  is_user_invite: z.boolean(),
 });
 
 const UpdateStaffSchema = z.object({

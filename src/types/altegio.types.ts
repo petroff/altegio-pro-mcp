@@ -196,7 +196,7 @@ export interface CreateStaffRequest {
   phone_number: string | null;
   user_email: string;
   user_phone: string;
-  is_user_invite: number;
+  is_user_invite: boolean;
 }
 
 export interface UpdateStaffRequest {

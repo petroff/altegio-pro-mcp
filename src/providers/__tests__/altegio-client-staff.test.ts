@@ -38,7 +38,7 @@ describe('AltegioClient - Staff CRUD', () => {
         phone_number: '1234567890',
         user_email: 'john@example.com',
         user_phone: '1234567890',
-        is_user_invite: 1,
+        is_user_invite: true,
       });
 
       expect(result.id).toBe(123);
@@ -67,7 +67,7 @@ describe('AltegioClient - Staff CRUD', () => {
           phone_number: '123',
           user_email: 'john@example.com',
           user_phone: '1234567890',
-          is_user_invite: 1,
+          is_user_invite: true,
         })
       ).rejects.toThrow('Not authenticated');
     });

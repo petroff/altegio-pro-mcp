@@ -80,6 +80,58 @@ const UpdateServiceSchema = z.object({
   active: z.number().int().min(0).max(1).optional(),
 });
 
+// ========== Bookings CRUD Schemas ==========
+const CreateBookingSchema = z.object({
+  company_id: z.number().int().positive(),
+  staff_id: z.number().int().positive(),
+  services: z.array(
+    z.object({
+      id: z.number().int().positive(),
+      amount: z.number().positive().optional(),
+    })
+  ),
+  datetime: z.string(),
+  seance_length: z.number().positive().optional(),
+  client: z.object({
+    name: z.string().min(1),
+    phone: z.string().min(1),
+    email: z.string().email().optional(),
+  }),
+  comment: z.string().optional(),
+  send_sms: z.number().int().min(0).max(1).optional(),
+  attendance: z.number().int().optional(),
+});
+
+const UpdateBookingSchema = z.object({
+  company_id: z.number().int().positive(),
+  record_id: z.number().int().positive(),
+  staff_id: z.number().int().positive().optional(),
+  services: z
+    .array(
+      z.object({
+        id: z.number().int().positive(),
+        amount: z.number().positive().optional(),
+      })
+    )
+    .optional(),
+  datetime: z.string().optional(),
+  seance_length: z.number().positive().optional(),
+  client: z
+    .object({
+      name: z.string().optional(),
+      phone: z.string().optional(),
+      email: z.string().email().optional(),
+    })
+    .optional(),
+  comment: z.string().optional(),
+  attendance: z.number().int().optional(),
+});
+
+const DeleteBookingSchema = z.object({
+  company_id: z.number().int().positive(),
+  record_id: z.number().int().positive(),
+});
+
 export class ToolHandlers {
   constructor(private client: AltegioClient) {}
 
@@ -421,6 +473,92 @@ export class ToolHandlers {
           {
             type: 'text' as const,
             text: `Failed to update service: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+      };
+    }
+  }
+
+  // ========== Bookings CRUD Operations ==========
+
+  async createBooking(args: unknown) {
+    try {
+      const params = CreateBookingSchema.parse(args);
+      const { company_id, ...bookingData } = params;
+
+      const booking = await this.client.createBooking(company_id, bookingData);
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully created booking:\nID: ${booking.id}\nStaff ID: ${booking.staff_id}\nDate: ${booking.datetime || booking.date}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to create booking: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+      };
+    }
+  }
+
+  async updateBooking(args: unknown) {
+    try {
+      const params = UpdateBookingSchema.parse(args);
+      const { company_id, record_id, ...updateData } = params;
+
+      const booking = await this.client.updateBooking(
+        company_id,
+        record_id,
+        updateData
+      );
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully updated booking ${record_id}:\nDate: ${booking.datetime || booking.date}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to update booking: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+      };
+    }
+  }
+
+  async deleteBooking(args: unknown) {
+    try {
+      const params = DeleteBookingSchema.parse(args);
+
+      await this.client.deleteBooking(params.company_id, params.record_id);
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully deleted booking ${params.record_id} from company ${params.company_id}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to delete booking: ${error instanceof Error ? error.message : 'Unknown error'}`,
           },
         ],
       };

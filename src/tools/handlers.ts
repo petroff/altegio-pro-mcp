@@ -29,6 +29,31 @@ const PublicListParamsSchema = z.object({
   count: z.number().int().positive().optional(),
 });
 
+// ========== Staff CRUD Schemas ==========
+const CreateStaffSchema = z.object({
+  company_id: z.number().int().positive(),
+  name: z.string().min(1),
+  specialization: z.string().min(1),
+  position_id: z.number().int().positive().nullable(),
+  phone_number: z.string().nullable(),
+});
+
+const UpdateStaffSchema = z.object({
+  company_id: z.number().int().positive(),
+  staff_id: z.number().int().positive(),
+  name: z.string().min(1).optional(),
+  specialization: z.string().optional(),
+  position_id: z.number().int().positive().nullable().optional(),
+  phone_number: z.string().nullable().optional(),
+  hidden: z.number().int().min(0).max(1).optional(),
+  fired: z.number().int().min(0).max(1).optional(),
+});
+
+const DeleteStaffSchema = z.object({
+  company_id: z.number().int().positive(),
+  staff_id: z.number().int().positive(),
+});
+
 export class ToolHandlers {
   constructor(private client: AltegioClient) {}
 
@@ -228,5 +253,91 @@ export class ToolHandlers {
         },
       ],
     };
+  }
+
+  // ========== Staff CRUD Operations ==========
+
+  async createStaff(args: unknown) {
+    try {
+      const params = CreateStaffSchema.parse(args);
+      const { company_id, ...staffData } = params;
+
+      const staff = await this.client.createStaff(company_id, staffData);
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully created staff member:\nID: ${staff.id}\nName: ${staff.name}\nSpecialization: ${staff.specialization}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to create staff: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+      };
+    }
+  }
+
+  async updateStaff(args: unknown) {
+    try {
+      const params = UpdateStaffSchema.parse(args);
+      const { company_id, staff_id, ...updateData } = params;
+
+      const staff = await this.client.updateStaff(
+        company_id,
+        staff_id,
+        updateData
+      );
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully updated staff member ${staff_id}:\nName: ${staff.name}\nSpecialization: ${staff.specialization}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to update staff: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+      };
+    }
+  }
+
+  async deleteStaff(args: unknown) {
+    try {
+      const params = DeleteStaffSchema.parse(args);
+
+      await this.client.deleteStaff(params.company_id, params.staff_id);
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully deleted staff member ${params.staff_id} from company ${params.company_id}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to delete staff: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+      };
+    }
   }
 }

@@ -453,4 +453,86 @@ export class AltegioClient {
 
     return result.data;
   }
+
+  // ========== Bookings CRUD Operations ==========
+
+  async createBooking(
+    companyId: number,
+    data: import('../types/altegio.types.js').CreateBookingRequest
+  ): Promise<AltegioBooking> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/records/${companyId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to create booking: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioBooking>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to create booking: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  async updateBooking(
+    companyId: number,
+    recordId: number,
+    data: import('../types/altegio.types.js').UpdateBookingRequest
+  ): Promise<AltegioBooking> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/record/${companyId}/${recordId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to update booking: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioBooking>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to update booking: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  async deleteBooking(companyId: number, recordId: number): Promise<void> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/record/${companyId}/${recordId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to delete booking: HTTP ${response.status} - ${errorText}`
+      );
+    }
+  }
 }

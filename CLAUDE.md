@@ -1,5 +1,12 @@
 # Altegio.Pro MCP Server - Project Context
 
+## Overview
+MCP (Model Context Protocol) server for Altegio.Pro business management API.
+- **Target users**: Local service business owners, administrators and team members
+- **Focus**: B2B authenticated operations only (no public B2C booking)
+- **Tech**: TypeScript, @modelcontextprotocol/sdk, Express for HTTP mode
+- **Package**: `@altegio/mcp-server-pro` (not published to npm)
+
 ## Quick Start
 
 **Tech Stack:** TypeScript, @modelcontextprotocol/sdk, Express (HTTP mode), Jest
@@ -15,23 +22,38 @@ npm run dev                  # HTTP mode on port 8080
 **Test:**
 ```bash
 npm test                     # run tests
-npm run test:watch         # watch mode
-npm run lint               # check code style
-npm run typecheck          # TypeScript validation
+npm run test:watch           # watch mode
+npm run lint                 # check code style
+npm run typecheck            # TypeScript validation
 ```
 
-**Deploy:**
-- Push to main → GitHub Actions → Cloud Build → Artifact Registry → Cloud Run (staging)
-- GCP Project: `altegio-mcp` (project #767969350727)
-- Staging URL: https://altegio-mcp-staging-767969350727.us-central1.run.app
+### File Structure
+
+```
+src/
+  core/          # MCP server initialization
+  providers/     # API clients (altegio-client.ts)
+  tools/         # Tool handlers & registry
+  types/         # TypeScript interfaces
+  utils/         # Logging, errors, config
+  index.ts       # stdio entry
+  http-server.ts # HTTP entry
+
+tests/           # Jest tests
+docs/plans/      # Design docs (keep latest refactoring only)
+dist/            # Built JS (gitignored)
+```
+
+**Build & Deploy:**
+Always check BUILD.md / never add it to Git
 
 ---
 
-## Project State (Altegio.Pro B2B Refactoring - COMPLETED)
+## Project description
 
 ### What This Server Does
 
-MCP server for **B2B business management only** (Altegio.Pro, not public booking). Salon/spa business owners and admins manage their operations through authenticated tools.
+MCP server for **B2B business management only** (Altegio.Pro, not public booking /b2c). Local service business business owners, admins and team members manage their operations through authenticated tools
 
 ### Tools Available (8 total)
 
@@ -51,16 +73,16 @@ MCP server for **B2B business management only** (Altegio.Pro, not public booking
 
 **Transports:**
 - **stdio** (default) → `dist/index.js` → Claude Desktop integration
-- **HTTP** → `dist/http-server.js` → Cloud Run on port 8080
+- **HTTP** → `dist/http-server.js` → Local on port 8080
   - `/health` - health check
-  - `/sse` - Server-Sent Events (OpenAI/ChatGPT)
+  - `/sse` - Server-Sent Events (OpenAI/Perplexity)
   - `/rpc` - JSON-RPC 2.0
   - `/mcp` - MCP SSE
 
 **Authentication:**
 - Partner token: `ALTEGIO_API_TOKEN` (required, from https://developer.alteg.io)
 - User token: obtained via `altegio_login`, saved to `~/.altegio-mcp/credentials.json`
-- API headers: `Authorization: Bearer {partner_token}`, `User-Token: {user_token}` (B2B only)
+- API headers: `Authorization: Bearer {partner_token}`, `User-Token: {user_token}` (To access internal information)
 
 **Key Files:**
 - `src/index.ts` - stdio entry point
@@ -71,26 +93,21 @@ MCP server for **B2B business management only** (Altegio.Pro, not public booking
 - `src/types/altegio.types.ts` - TypeScript types
 - `src/utils/` - logging, errors, config, credential manager
 
-### Refactoring History
+### Change history
 
-**2025-01-25: MCP SDK Migration**
-- Switched from custom JSON-RPC to `@modelcontextprotocol/sdk`
-- Added stdio and SSE transports
-- Tests: 64 passing
-
-**2025-10-27: Altegio.Pro B2B Refactoring** ✅ COMPLETED
+**Altegio.Pro B2B Refactoring** 
 - **Removed 5 B2C tools:** get_company, get_booking_dates, get_booking_staff (no B2B alternatives)
 - **Updated 2 tools to B2B:** get_staff, get_services (now require user_token)
 - **Added 1 tool:** get_schedule (new admin schedule management)
 - **Kept 1 public tool:** get_service_categories (only version available in API)
 - All operations except login/logout now require user_token
-- Tests: 68 passing
 - Implementation method: Test-driven development (write failing test → implement → verify)
 - Breaking change: B2C users have no access (intentional rebranding)
 
 ### API Reference
 
 **Base URL:** `https://api.alteg.io/api/v1`
+**Docs:** https://developer.alteg.io/api (also cached at `/tmp/alteg_api.html`)
 
 **B2B Endpoints (require user_token):**
 - `GET /staff/{company_id}` - staff with admin details
@@ -120,17 +137,17 @@ async getStaff(companyId: number) {
 }
 ```
 
+**Secrets Management:**
+- Local: `.env` file (gitignored)
+- Never commit tokens to git
+
+
 **Test isolation:**
 - Tests default to `~/.altegio-mcp/` credentials
 - Pass `testDir` parameter to use isolated test directory:
   ```typescript
   new AltegioClient(config, testDir)
   ```
-
-**Build after changes:**
-- Always run `npm run build` after source modifications
-- Verify `dist/` is updated before commits
-- CI/CD rebuilds automatically
 
 ---
 
@@ -149,26 +166,6 @@ CREDENTIALS_DIR=~/.altegio-mcp
 RATE_LIMIT_REQUESTS=200
 MAX_RETRY_ATTEMPTS=3
 ```
-
----
-
-## Known Issues / Security Notes
-
-**Credential storage:** User tokens stored in plaintext at `~/.altegio-mcp/credentials.json` - consider encryption for production
-
-**Token expiration:** No automatic refresh handling - implement if tokens expire
-
-**Logout cleanup:** Logout doesn't delete credentials file - should be fixed
-
----
-
-## Next Steps for Improvement
-
-1. **Add credential encryption** - `~/.altegio-mcp/credentials.json` is plaintext
-2. **Implement token refresh** - handle expiration gracefully
-3. **Fix logout cleanup** - remove credentials file on logout
-4. **Add integration tests** - beyond Docker, add Jest integration suite
-5. **Verify pagination** - ensure all list endpoints consistently implement it
 
 ---
 

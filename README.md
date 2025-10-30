@@ -12,9 +12,11 @@ MCP server for Altegio.Pro business management API - B2B integration for salon/s
 
 ## Features
 
-- **16 MCP tools** for business management (CRUD operations for staff, services, bookings)
+- **26 MCP tools** including 10 onboarding wizard tools for first-time setup
+- **CRUD operations** for staff, services, and bookings management
+- **Conversational onboarding** with bulk CSV/JSON import and checkpoint/resume
 - **Dual transport:** stdio for Claude Desktop, HTTP for cloud deployments
-- **TypeScript** with full type safety and comprehensive tests (68 passing)
+- **TypeScript** with full type safety and comprehensive tests (145 passing)
 - **Auto-deploy CI/CD** via Cloud Build on push to main
 - **Rate limiting** and **retry logic** with exponential backoff
 - **Secure credential storage** in `~/.altegio-mcp/`
@@ -39,8 +41,19 @@ MCP server for Altegio.Pro business management API - B2B integration for salon/s
 | `create_booking` | Create client appointment | Yes |
 | `update_booking` | Modify existing appointment | Yes |
 | `delete_booking` | Cancel appointment | Yes |
+| **Onboarding Wizard** | | |
+| `onboarding_start` | Initialize onboarding session | Yes |
+| `onboarding_resume` | Resume interrupted onboarding | Yes |
+| `onboarding_status` | Check onboarding progress | Yes |
+| `onboarding_add_categories` | Bulk create service categories | Yes |
+| `onboarding_add_staff_batch` | Bulk import staff (CSV/JSON) | Yes |
+| `onboarding_add_services_batch` | Bulk import services (CSV/JSON) | Yes |
+| `onboarding_import_clients` | Import client database | Yes |
+| `onboarding_create_test_bookings` | Generate sample bookings | Yes |
+| `onboarding_preview_data` | Validate data before import | Yes |
+| `onboarding_rollback_phase` | Undo specific onboarding phase | Yes |
 
-**Note:** Services DELETE operation is not available in Altegio API. All write operations require user authentication via `altegio_login`.
+**Note:** Services DELETE operation is not available in Altegio API. All write operations require user authentication via `altegio_login`. See [Onboarding Guide](docs/ONBOARDING_GUIDE.md) for first-time setup workflows.
 
 ## Quick Start
 
@@ -82,6 +95,69 @@ npm run build
 3. Restart Claude Desktop
 
 See [CLAUDE_DESKTOP_SETUP.md](CLAUDE_DESKTOP_SETUP.md) for detailed setup.
+
+## Onboarding Wizard
+
+**New in v2.0:** Conversational assistant for first-time platform setup. Import staff, services, and clients through natural language or bulk CSV upload.
+
+### Quick Onboarding Flow
+
+```typescript
+// 1. Login and start
+altegio_login({ email: "owner@salon.com", password: "..." })
+onboarding_start({ company_id: 123456 })
+
+// 2. Create categories
+onboarding_add_categories({
+  company_id: 123456,
+  categories: [
+    { title: "Hair Services" },
+    { title: "Nail Services" }
+  ]
+})
+
+// 3. Import staff (CSV or JSON)
+onboarding_add_staff_batch({
+  company_id: 123456,
+  staff_data: `name,specialization,phone
+Alice Johnson,Senior Stylist,+1234567890
+Bob Smith,Nail Technician,+1234567891`
+})
+
+// 4. Add services
+onboarding_add_services_batch({
+  company_id: 123456,
+  services_data: [
+    { title: "Haircut", price_min: 50, duration: 60 },
+    { title: "Manicure", price_min: 30, duration: 45 }
+  ]
+})
+
+// 5. Import clients
+onboarding_import_clients({
+  company_id: 123456,
+  clients_csv: `name,phone,email
+Sarah Miller,+1234560001,sarah@example.com
+John Davis,+1234560002,john@example.com`
+})
+
+// 6. Generate test bookings
+onboarding_create_test_bookings({ company_id: 123456, count: 5 })
+
+// 7. Check progress
+onboarding_status({ company_id: 123456 })
+```
+
+**Key Features:**
+- **Checkpoint/Resume:** Automatically recovers from errors or interruptions
+- **Hybrid Input:** Accept JSON arrays or CSV strings
+- **Preview Mode:** Validate data before importing (`onboarding_preview_data`)
+- **Rollback:** Undo specific phases (`onboarding_rollback_phase`)
+- **Progress Tracking:** View completion status (`onboarding_status`)
+
+**Time Savings:** 5-10 minutes vs 30+ minutes manual setup
+
+See [docs/ONBOARDING_GUIDE.md](docs/ONBOARDING_GUIDE.md) for complete guide with CSV templates, error handling, and troubleshooting.
 
 ### Cloud Deployment
 

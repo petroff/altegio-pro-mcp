@@ -2,6 +2,7 @@ import { AltegioClient } from '../providers/altegio-client.js';
 import { OnboardingStateManager } from '../providers/onboarding-state-manager.js';
 import { z } from 'zod';
 import { parseCSV } from '../utils/csv-parser.js';
+import { logger } from '../utils/logger.js';
 import {
   StaffBatchSchema,
   ServiceBatchSchema,
@@ -37,6 +38,11 @@ const CategoryArgsSchema = z.object({
 const ClientImportArgsSchema = z.object({
   company_id: z.number(),
   clients_csv: z.string()
+});
+
+const TestBookingsArgsSchema = z.object({
+  company_id: z.number(),
+  count: z.number().min(1).max(10).default(5)
 });
 
 export class OnboardingHandlers {
@@ -322,6 +328,72 @@ export class OnboardingHandlers {
                 `✓ ${created.length} clients imported\n` +
                 (errors.length ? `✗ ${errors.length} failed:\n  ${errors.join('\n  ')}\n` : '') +
                 `\nNext: Create test bookings with onboarding_create_test_bookings`
+        }
+      ]
+    };
+  }
+
+  async createTestBookings(args: unknown) {
+    if (!this.client.isAuthenticated()) {
+      throw new Error('Authentication required. Please use altegio_login first.');
+    }
+
+    const { company_id, count } = TestBookingsArgsSchema.parse(args);
+    const state = await this.stateManager.load(company_id);
+
+    if (!state) {
+      throw new Error(`No onboarding session found for company ${company_id}`);
+    }
+
+    const staffIds = state.checkpoints['staff']?.entity_ids || [];
+    const serviceIds = state.checkpoints['services']?.entity_ids || [];
+
+    if (staffIds.length === 0 || serviceIds.length === 0) {
+      throw new Error('No staff or services found. Complete previous steps first.');
+    }
+
+    const created: number[] = [];
+
+    for (let i = 0; i < count; i++) {
+      const staffId = staffIds[i % staffIds.length]!;
+      const serviceId = serviceIds[i % serviceIds.length]!;
+
+      // Generate booking 1-7 days in future
+      const daysAhead = 1 + (i % 7);
+      const date = new Date();
+      date.setDate(date.getDate() + daysAhead);
+      const datetime = date.toISOString().split('T')[0] + ' 10:00:00';
+
+      try {
+        const booking = await this.client.createBooking(company_id, {
+          staff_id: staffId,
+          services: [{ id: serviceId }],
+          datetime,
+          client: {
+            name: `Test Client ${i + 1}`,
+            phone: `+100000000${i}`
+          }
+        });
+        created.push(booking.id);
+      } catch (error) {
+        logger.warn({ error }, 'Failed to create test booking');
+      }
+    }
+
+    await this.stateManager.checkpoint(company_id, 'test_bookings', created);
+    await this.stateManager.updatePhase(company_id, 'complete');
+
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: `Test bookings created: ${created.length}\n\n` +
+                `Onboarding complete! ✓\n\n` +
+                `Summary:\n` +
+                `  - Staff: ${staffIds.length}\n` +
+                `  - Services: ${serviceIds.length}\n` +
+                `  - Test bookings: ${created.length}\n\n` +
+                `Your platform is ready to use!`
         }
       ]
     };

@@ -175,4 +175,30 @@ describe('Onboarding Handlers', () => {
       expect(mockClient.createClient).toHaveBeenCalledTimes(2);
     });
   });
+
+  describe('createTestBookings', () => {
+    it('should generate test bookings', async () => {
+      await handlers.start({ company_id: 123 });
+      await stateManager.checkpoint(123, 'staff', [1, 2]);
+      await stateManager.checkpoint(123, 'services', [10, 11]);
+
+      mockClient.createBooking = jest.fn()
+        .mockResolvedValue({ id: 100 });
+
+      const result = await handlers.createTestBookings({
+        company_id: 123,
+        count: 3
+      });
+
+      expect(result.content[0]?.text).toContain('Test bookings created: 3');
+      expect(mockClient.createBooking).toHaveBeenCalledTimes(3);
+    });
+
+    it('should reject if no staff exist', async () => {
+      await handlers.start({ company_id: 123 });
+
+      await expect(handlers.createTestBookings({ company_id: 123, count: 2 }))
+        .rejects.toThrow('No staff or services found');
+    });
+  });
 });

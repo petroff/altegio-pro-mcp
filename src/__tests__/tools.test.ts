@@ -53,8 +53,13 @@ describe('Tool Registration', () => {
     expect(toolNames).toContain('onboarding_preview_data');
     expect(toolNames).toContain('onboarding_rollback_phase');
 
-    // Total: 16 + 10 = 26 tools
-    expect(toolNames.length).toBe(26);
+    // Schedule management tools
+    expect(toolNames).toContain('create_schedule');
+    expect(toolNames).toContain('update_schedule');
+    expect(toolNames).toContain('delete_schedule');
+
+    // Total: 16 + 10 + 3 = 29 tools
+    expect(toolNames.length).toBe(29);
   });
 
   it('should create server with tools', () => {

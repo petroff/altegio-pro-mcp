@@ -36,6 +36,21 @@ export declare class AltegioClient {
      * Get employee schedule for a date range (B2B API, requires user auth)
      */
     getSchedule(companyId: number, staffId: number, startDate: string, endDate: string): Promise<AltegioScheduleEntry[]>;
+    /**
+     * Create or update employee schedule (B2B API, requires user auth)
+     * PUT /schedule/{company_id}
+     */
+    createSchedule(companyId: number, data: import('../types/altegio.types.js').CreateScheduleRequest): Promise<AltegioScheduleEntry[]>;
+    /**
+     * Update employee schedule (B2B API, requires user auth)
+     * PUT /schedule/{company_id}
+     */
+    updateSchedule(companyId: number, data: import('../types/altegio.types.js').UpdateScheduleRequest): Promise<AltegioScheduleEntry[]>;
+    /**
+     * Delete employee schedule for a specific date (B2B API, requires user auth)
+     * DELETE /schedule/{company_id}/{staff_id}/{date}
+     */
+    deleteSchedule(companyId: number, staffId: number, date: string): Promise<void>;
     createStaff(companyId: number, data: import('../types/altegio.types.js').CreateStaffRequest): Promise<AltegioStaff>;
     updateStaff(companyId: number, staffId: number, data: import('../types/altegio.types.js').UpdateStaffRequest): Promise<AltegioStaff>;
     deleteStaff(companyId: number, staffId: number): Promise<void>;

@@ -188,6 +188,23 @@ export interface AltegioScheduleEntry {
 
 // ========== Write Operation Request Types ==========
 
+// Schedule
+export interface CreateScheduleRequest {
+  staff_id: number;
+  date: string; // YYYY-MM-DD
+  time_from: string; // HH:MM
+  time_to: string; // HH:MM
+  seance_length?: number; // Duration in minutes
+}
+
+export interface UpdateScheduleRequest {
+  staff_id: number;
+  date: string; // YYYY-MM-DD
+  time_from?: string; // HH:MM
+  time_to?: string; // HH:MM
+  seance_length?: number; // Duration in minutes
+}
+
 // Staff
 export interface CreateStaffRequest {
   name: string;

@@ -201,6 +201,81 @@ const tools: ToolDefinition[] = [
     },
   },
   {
+    name: 'create_schedule',
+    description:
+      'Create employee work schedule. AUTHENTICATION REQUIRED - administrative access to create staff working schedule. Defines when an employee is available to work (e.g., "Monday 9:00-18:00"). Use this to set up or modify work hours.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'ID of the company' },
+        staff_id: { type: 'number', description: 'ID of the staff member' },
+        date: {
+          type: 'string',
+          description: 'Date for the schedule (YYYY-MM-DD format)',
+        },
+        time_from: {
+          type: 'string',
+          description: 'Start time (HH:MM format, e.g., "09:00")',
+        },
+        time_to: {
+          type: 'string',
+          description: 'End time (HH:MM format, e.g., "18:00")',
+        },
+        seance_length: {
+          type: 'number',
+          description: 'Session length in minutes (optional)',
+        },
+      },
+      required: ['company_id', 'staff_id', 'date', 'time_from', 'time_to'],
+    },
+  },
+  {
+    name: 'update_schedule',
+    description:
+      'Update employee work schedule. AUTHENTICATION REQUIRED - administrative access to modify staff working schedule. Updates existing work hours for a specific date.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'ID of the company' },
+        staff_id: { type: 'number', description: 'ID of the staff member' },
+        date: {
+          type: 'string',
+          description: 'Date for the schedule (YYYY-MM-DD format)',
+        },
+        time_from: {
+          type: 'string',
+          description: 'New start time (HH:MM format, e.g., "09:00")',
+        },
+        time_to: {
+          type: 'string',
+          description: 'New end time (HH:MM format, e.g., "18:00")',
+        },
+        seance_length: {
+          type: 'number',
+          description: 'Session length in minutes (optional)',
+        },
+      },
+      required: ['company_id', 'staff_id', 'date'],
+    },
+  },
+  {
+    name: 'delete_schedule',
+    description:
+      'Delete employee work schedule for a specific date. AUTHENTICATION REQUIRED - administrative access to remove staff working schedule. Removes work hours for the specified date.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'ID of the company' },
+        staff_id: { type: 'number', description: 'ID of the staff member' },
+        date: {
+          type: 'string',
+          description: 'Date to delete schedule (YYYY-MM-DD format)',
+        },
+      },
+      required: ['company_id', 'staff_id', 'date'],
+    },
+  },
+  {
     name: 'create_staff',
     description:
       'Create a new employee/staff member. AUTHENTICATION REQUIRED. Required fields: name, specialization, position_id, phone_number, user_email, user_phone, is_user_invite.',
@@ -446,6 +521,12 @@ export function registerTools(server: Server, client: AltegioClient): string[] {
           return await handlers.getServiceCategories(args);
         case 'get_schedule':
           return await handlers.getSchedule(args);
+        case 'create_schedule':
+          return await handlers.createSchedule(args);
+        case 'update_schedule':
+          return await handlers.updateSchedule(args);
+        case 'delete_schedule':
+          return await handlers.deleteSchedule(args);
         case 'create_staff':
           return await handlers.createStaff(args);
         case 'update_staff':

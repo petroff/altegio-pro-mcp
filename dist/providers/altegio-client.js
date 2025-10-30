@@ -186,6 +186,73 @@ export class AltegioClient {
         }
         throw new Error(result.meta?.message || 'Failed to fetch schedule');
     }
+    // ========== Schedule CRUD Operations ==========
+    /**
+     * Create or update employee schedule (B2B API, requires user auth)
+     * PUT /schedule/{company_id}
+     */
+    async createSchedule(companyId, data) {
+        if (!this.userToken) {
+            throw new Error('Not authenticated. Use login() first.');
+        }
+        const response = await this.apiRequest(`/schedule/${companyId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to create schedule: HTTP ${response.status} - ${errorText}`);
+        }
+        const result = (await response.json());
+        if (!result.success || !result.data) {
+            throw new Error(result.meta?.message || 'Failed to create schedule: Invalid response');
+        }
+        return result.data;
+    }
+    /**
+     * Update employee schedule (B2B API, requires user auth)
+     * PUT /schedule/{company_id}
+     */
+    async updateSchedule(companyId, data) {
+        if (!this.userToken) {
+            throw new Error('Not authenticated. Use login() first.');
+        }
+        const response = await this.apiRequest(`/schedule/${companyId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to update schedule: HTTP ${response.status} - ${errorText}`);
+        }
+        const result = (await response.json());
+        if (!result.success || !result.data) {
+            throw new Error(result.meta?.message || 'Failed to update schedule: Invalid response');
+        }
+        return result.data;
+    }
+    /**
+     * Delete employee schedule for a specific date (B2B API, requires user auth)
+     * DELETE /schedule/{company_id}/{staff_id}/{date}
+     */
+    async deleteSchedule(companyId, staffId, date) {
+        if (!this.userToken) {
+            throw new Error('Not authenticated. Use login() first.');
+        }
+        const response = await this.apiRequest(`/schedule/${companyId}/${staffId}/${date}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to delete schedule: HTTP ${response.status} - ${errorText}`);
+        }
+    }
     // ========== Staff CRUD Operations ==========
     async createStaff(companyId, data) {
         if (!this.userToken) {

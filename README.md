@@ -12,8 +12,8 @@ MCP server for Altegio.Pro business management API - B2B integration for salon/s
 
 ## Features
 
-- **26 MCP tools** including 10 onboarding wizard tools for first-time setup
-- **CRUD operations** for staff, services, and bookings management
+- **29 MCP tools** including 10 onboarding wizard tools for first-time setup
+- **CRUD operations** for staff, services, bookings, and schedules management
 - **Conversational onboarding** with bulk CSV/JSON import and checkpoint/resume
 - **Dual transport:** stdio for Claude Desktop, HTTP for cloud deployments
 - **TypeScript** with full type safety and comprehensive tests (145 passing)
@@ -33,6 +33,9 @@ MCP server for Altegio.Pro business management API - B2B integration for salon/s
 | `get_services` | View services with configuration | Yes |
 | `get_service_categories` | View service categories | Yes |
 | `get_schedule` | View employee schedules | Yes |
+| `create_schedule` | Create employee work schedule | Yes |
+| `update_schedule` | Update employee work schedule | Yes |
+| `delete_schedule` | Delete employee work schedule | Yes |
 | `create_staff` | Create new employee | Yes |
 | `update_staff` | Update employee details | Yes |
 | `delete_staff` | Remove employee | Yes |

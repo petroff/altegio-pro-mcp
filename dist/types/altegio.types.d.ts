@@ -168,6 +168,20 @@ export interface AltegioScheduleEntry {
     seance_length: number;
     datetime: string;
 }
+export interface CreateScheduleRequest {
+    staff_id: number;
+    date: string;
+    time_from: string;
+    time_to: string;
+    seance_length?: number;
+}
+export interface UpdateScheduleRequest {
+    staff_id: number;
+    date: string;
+    time_from?: string;
+    time_to?: string;
+    seance_length?: number;
+}
 export interface CreateStaffRequest {
     name: string;
     specialization: string;

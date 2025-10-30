@@ -117,6 +117,28 @@ const DeleteBookingSchema = z.object({
     company_id: z.number().int().positive(),
     record_id: z.number().int().positive(),
 });
+// ========== Schedule CRUD Schemas ==========
+const CreateScheduleSchema = z.object({
+    company_id: z.number().int().positive(),
+    staff_id: z.number().int().positive(),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    time_from: z.string().regex(/^\d{2}:\d{2}$/),
+    time_to: z.string().regex(/^\d{2}:\d{2}$/),
+    seance_length: z.number().int().positive().optional(),
+});
+const UpdateScheduleSchema = z.object({
+    company_id: z.number().int().positive(),
+    staff_id: z.number().int().positive(),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    time_from: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+    time_to: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+    seance_length: z.number().int().positive().optional(),
+});
+const DeleteScheduleSchema = z.object({
+    company_id: z.number().int().positive(),
+    staff_id: z.number().int().positive(),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
 export class ToolHandlers {
     client;
     constructor(client) {
@@ -261,6 +283,84 @@ export class ToolHandlers {
                 },
             ],
         };
+    }
+    // ========== Schedule CRUD Operations ==========
+    async createSchedule(args) {
+        try {
+            const params = CreateScheduleSchema.parse(args);
+            const { company_id, ...scheduleData } = params;
+            const schedule = await this.client.createSchedule(company_id, scheduleData);
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Successfully created schedule for staff ${params.staff_id} on ${params.date}:\nTime: ${params.time_from} - ${params.time_to}\nEntries created: ${schedule.length}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Failed to create schedule: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+                isError: true,
+            };
+        }
+    }
+    async updateSchedule(args) {
+        try {
+            const params = UpdateScheduleSchema.parse(args);
+            const { company_id, ...scheduleData } = params;
+            const schedule = await this.client.updateSchedule(company_id, scheduleData);
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Successfully updated schedule for staff ${params.staff_id} on ${params.date}\nEntries updated: ${schedule.length}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Failed to update schedule: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+                isError: true,
+            };
+        }
+    }
+    async deleteSchedule(args) {
+        try {
+            const params = DeleteScheduleSchema.parse(args);
+            await this.client.deleteSchedule(params.company_id, params.staff_id, params.date);
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Successfully deleted schedule for staff ${params.staff_id} on ${params.date}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Failed to delete schedule: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+                isError: true,
+            };
+        }
     }
     // ========== Staff CRUD Operations ==========
     async createStaff(args) {

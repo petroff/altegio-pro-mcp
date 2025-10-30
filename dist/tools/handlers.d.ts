@@ -50,6 +50,45 @@ export declare class ToolHandlers {
             text: string;
         }[];
     }>;
+    createSchedule(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
+    updateSchedule(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
+    deleteSchedule(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
     createStaff(args: unknown): Promise<{
         content: {
             type: "text";

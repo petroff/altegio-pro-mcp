@@ -6,7 +6,10 @@ import {
   ErrorCode,
 } from '@modelcontextprotocol/sdk/types.js';
 import { ToolHandlers } from './handlers.js';
+import { OnboardingHandlers } from './onboarding-handlers.js';
 import { AltegioClient } from '../providers/altegio-client.js';
+import { OnboardingStateManager } from '../providers/onboarding-state-manager.js';
+import { onboardingTools } from './onboarding-registry.js';
 
 interface ToolDefinition {
   name: string;
@@ -404,11 +407,16 @@ const tools: ToolDefinition[] = [
 
 export function registerTools(server: Server, client: AltegioClient): string[] {
   const handlers = new ToolHandlers(client);
+  const stateManager = new OnboardingStateManager();
+  const onboardingHandlers = new OnboardingHandlers(client, stateManager);
+
+  // Combine all tools
+  const allTools = [...tools, ...onboardingTools];
 
   // Register list handler
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     return {
-      tools: tools.map((t) => ({
+      tools: allTools.map((t) => ({
         name: t.name,
         description: t.description,
         inputSchema: t.inputSchema,
@@ -454,6 +462,29 @@ export function registerTools(server: Server, client: AltegioClient): string[] {
           return await handlers.updateBooking(args);
         case 'delete_booking':
           return await handlers.deleteBooking(args);
+
+        // Onboarding tools
+        case 'onboarding_start':
+          return await onboardingHandlers.start(args);
+        case 'onboarding_resume':
+          return await onboardingHandlers.resume(args);
+        case 'onboarding_status':
+          return await onboardingHandlers.status(args);
+        case 'onboarding_add_staff_batch':
+          return await onboardingHandlers.addStaffBatch(args);
+        case 'onboarding_add_services_batch':
+          return await onboardingHandlers.addServicesBatch(args);
+        case 'onboarding_add_categories':
+          return await onboardingHandlers.addCategories(args);
+        case 'onboarding_import_clients':
+          return await onboardingHandlers.importClients(args);
+        case 'onboarding_create_test_bookings':
+          return await onboardingHandlers.createTestBookings(args);
+        case 'onboarding_preview_data':
+          return await onboardingHandlers.previewData(args);
+        case 'onboarding_rollback_phase':
+          return await onboardingHandlers.rollbackPhase(args);
+
         default:
           throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
       }
@@ -468,5 +499,5 @@ export function registerTools(server: Server, client: AltegioClient): string[] {
     }
   });
 
-  return tools.map((t) => t.name);
+  return allTools.map((t) => t.name);
 }

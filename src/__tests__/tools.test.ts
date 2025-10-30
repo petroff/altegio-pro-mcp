@@ -23,6 +23,7 @@ describe('Tool Registration', () => {
 
     const toolNames = registerTools(server, client);
 
+    // Core tools (16)
     expect(toolNames).toContain('altegio_login');
     expect(toolNames).toContain('altegio_logout');
     expect(toolNames).toContain('list_companies');
@@ -39,7 +40,21 @@ describe('Tool Registration', () => {
     expect(toolNames).toContain('create_booking');
     expect(toolNames).toContain('update_booking');
     expect(toolNames).toContain('delete_booking');
-    expect(toolNames.length).toBe(16);
+
+    // Onboarding tools (10)
+    expect(toolNames).toContain('onboarding_start');
+    expect(toolNames).toContain('onboarding_resume');
+    expect(toolNames).toContain('onboarding_status');
+    expect(toolNames).toContain('onboarding_add_staff_batch');
+    expect(toolNames).toContain('onboarding_add_services_batch');
+    expect(toolNames).toContain('onboarding_add_categories');
+    expect(toolNames).toContain('onboarding_import_clients');
+    expect(toolNames).toContain('onboarding_create_test_bookings');
+    expect(toolNames).toContain('onboarding_preview_data');
+    expect(toolNames).toContain('onboarding_rollback_phase');
+
+    // Total: 16 + 10 = 26 tools
+    expect(toolNames.length).toBe(26);
   });
 
   it('should create server with tools', () => {

@@ -8,6 +8,7 @@ import type {
   AltegioStaff,
   AltegioService,
   AltegioServiceCategory,
+  AltegioPosition,
   AltegioScheduleEntry,
   AltegioBookingParams,
   AltegioCompaniesParams,
@@ -270,6 +271,31 @@ export class AltegioClient {
   }
 
   /**
+   * Get company positions (B2B API, requires user auth)
+   */
+  async getPositions(companyId: number): Promise<AltegioPosition[]> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated');
+    }
+
+    const response = await this.apiRequest(`/positions/${companyId}`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch positions: ${response.statusText}`);
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<
+      AltegioPosition[]
+    >;
+
+    if (result.success && result.data) {
+      return result.data;
+    }
+
+    throw new Error(result.meta?.message || 'Failed to fetch positions');
+  }
+
+  /**
    * Get employee schedule for a date range (B2B API, requires user auth)
    */
   async getSchedule(
@@ -299,6 +325,114 @@ export class AltegioClient {
     }
 
     throw new Error(result.meta?.message || 'Failed to fetch schedule');
+  }
+
+  // ========== Schedule CRUD Operations ==========
+
+  /**
+   * Create or update employee schedule (B2B API, requires user auth)
+   * PUT /schedule/{company_id}
+   */
+  async createSchedule(
+    companyId: number,
+    data: import('../types/altegio.types.js').CreateScheduleRequest
+  ): Promise<AltegioScheduleEntry[]> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/schedule/${companyId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to create schedule: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<
+      AltegioScheduleEntry[]
+    >;
+    if (!result.success || !result.data) {
+      throw new Error(
+        result.meta?.message || 'Failed to create schedule: Invalid response'
+      );
+    }
+
+    return result.data;
+  }
+
+  /**
+   * Update employee schedule (B2B API, requires user auth)
+   * PUT /schedule/{company_id}
+   */
+  async updateSchedule(
+    companyId: number,
+    data: import('../types/altegio.types.js').UpdateScheduleRequest
+  ): Promise<AltegioScheduleEntry[]> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/schedule/${companyId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to update schedule: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<
+      AltegioScheduleEntry[]
+    >;
+    if (!result.success || !result.data) {
+      throw new Error(
+        result.meta?.message || 'Failed to update schedule: Invalid response'
+      );
+    }
+
+    return result.data;
+  }
+
+  /**
+   * Delete employee schedule for a specific date (B2B API, requires user auth)
+   * DELETE /schedule/{company_id}/{staff_id}/{date}
+   */
+  async deleteSchedule(
+    companyId: number,
+    staffId: number,
+    date: string
+  ): Promise<void> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(
+      `/schedule/${companyId}/${staffId}/${date}`,
+      {
+        method: 'DELETE',
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to delete schedule: HTTP ${response.status} - ${errorText}`
+      );
+    }
   }
 
   // ========== Staff CRUD Operations ==========
@@ -452,6 +586,94 @@ export class AltegioClient {
     }
 
     return result.data;
+  }
+
+  // ========== Positions CRUD Operations ==========
+
+  async createPosition(
+    companyId: number,
+    data: import('../types/altegio.types.js').CreatePositionRequest
+  ): Promise<AltegioPosition> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/positions/${companyId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to create position: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioPosition>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to create position: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  async updatePosition(
+    companyId: number,
+    positionId: number,
+    data: import('../types/altegio.types.js').UpdatePositionRequest
+  ): Promise<AltegioPosition> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(
+      `/positions/${companyId}/${positionId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to update position: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioPosition>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to update position: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  async deletePosition(companyId: number, positionId: number): Promise<void> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(
+      `/positions/${companyId}/${positionId}`,
+      {
+        method: 'DELETE',
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to delete position: HTTP ${response.status} - ${errorText}`
+      );
+    }
   }
 
   // ========== Bookings CRUD Operations ==========

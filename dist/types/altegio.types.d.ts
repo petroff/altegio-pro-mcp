@@ -122,6 +122,12 @@ export interface AltegioError extends Error {
     statusCode?: number;
     response?: unknown;
 }
+export interface AltegioPosition {
+    id: number;
+    title: string;
+    api_id?: string | null;
+    [key: string]: unknown;
+}
 export interface AltegioStaff {
     id: number;
     api_id?: string | null;
@@ -167,6 +173,20 @@ export interface AltegioScheduleEntry {
     time: string;
     seance_length: number;
     datetime: string;
+}
+export interface CreateScheduleRequest {
+    staff_id: number;
+    date: string;
+    time_from: string;
+    time_to: string;
+    seance_length?: number;
+}
+export interface UpdateScheduleRequest {
+    staff_id: number;
+    date: string;
+    time_from?: string;
+    time_to?: string;
+    seance_length?: number;
 }
 export interface CreateStaffRequest {
     name: string;
@@ -257,5 +277,13 @@ export interface CreateCategoryRequest {
     title: string;
     api_id?: string;
     weight?: number;
+}
+export interface CreatePositionRequest {
+    title: string;
+    api_id?: string;
+}
+export interface UpdatePositionRequest {
+    title?: string;
+    api_id?: string;
 }
 //# sourceMappingURL=altegio.types.d.ts.map

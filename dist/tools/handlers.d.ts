@@ -50,6 +50,45 @@ export declare class ToolHandlers {
             text: string;
         }[];
     }>;
+    createSchedule(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
+    updateSchedule(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
+    deleteSchedule(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
     createStaff(args: unknown): Promise<{
         content: {
             type: "text";
@@ -79,6 +118,58 @@ export declare class ToolHandlers {
             type: "text";
             text: string;
         }[];
+    }>;
+    getPositions(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
+    createPosition(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
+    updatePosition(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
+    deletePosition(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
     }>;
     createBooking(args: unknown): Promise<{
         content: {

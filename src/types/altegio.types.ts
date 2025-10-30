@@ -135,6 +135,13 @@ export interface AltegioError extends Error {
 
 // Public booking API types (no user auth required)
 
+export interface AltegioPosition {
+  id: number;
+  title: string;
+  api_id?: string | null;
+  [key: string]: unknown;
+}
+
 export interface AltegioStaff {
   id: number;
   api_id?: string | null;
@@ -187,6 +194,23 @@ export interface AltegioScheduleEntry {
 }
 
 // ========== Write Operation Request Types ==========
+
+// Schedule
+export interface CreateScheduleRequest {
+  staff_id: number;
+  date: string; // YYYY-MM-DD
+  time_from: string; // HH:MM
+  time_to: string; // HH:MM
+  seance_length?: number; // Duration in minutes
+}
+
+export interface UpdateScheduleRequest {
+  staff_id: number;
+  date: string; // YYYY-MM-DD
+  time_from?: string; // HH:MM
+  time_to?: string; // HH:MM
+  seance_length?: number; // Duration in minutes
+}
 
 // Staff
 export interface CreateStaffRequest {
@@ -284,4 +308,15 @@ export interface CreateCategoryRequest {
   title: string;
   api_id?: string;
   weight?: number;
+}
+
+// Positions
+export interface CreatePositionRequest {
+  title: string;
+  api_id?: string;
+}
+
+export interface UpdatePositionRequest {
+  title?: string;
+  api_id?: string;
 }

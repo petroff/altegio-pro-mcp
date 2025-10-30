@@ -83,6 +83,25 @@ const UpdateServiceSchema = z.object({
   active: z.number().int().min(0).max(1).optional(),
 });
 
+// ========== Positions CRUD Schemas ==========
+const CreatePositionSchema = z.object({
+  company_id: z.number().int().positive(),
+  title: z.string().min(1),
+  api_id: z.string().optional(),
+});
+
+const UpdatePositionSchema = z.object({
+  company_id: z.number().int().positive(),
+  position_id: z.number().int().positive(),
+  title: z.string().min(1).optional(),
+  api_id: z.string().optional(),
+});
+
+const DeletePositionSchema = z.object({
+  company_id: z.number().int().positive(),
+  position_id: z.number().int().positive(),
+});
+
 // ========== Bookings CRUD Schemas ==========
 const CreateBookingSchema = z.object({
   company_id: z.number().int().positive(),
@@ -133,6 +152,31 @@ const UpdateBookingSchema = z.object({
 const DeleteBookingSchema = z.object({
   company_id: z.number().int().positive(),
   record_id: z.number().int().positive(),
+});
+
+// ========== Schedule CRUD Schemas ==========
+const CreateScheduleSchema = z.object({
+  company_id: z.number().int().positive(),
+  staff_id: z.number().int().positive(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  time_from: z.string().regex(/^\d{2}:\d{2}$/),
+  time_to: z.string().regex(/^\d{2}:\d{2}$/),
+  seance_length: z.number().int().positive().optional(),
+});
+
+const UpdateScheduleSchema = z.object({
+  company_id: z.number().int().positive(),
+  staff_id: z.number().int().positive(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  time_from: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  time_to: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  seance_length: z.number().int().positive().optional(),
+});
+
+const DeleteScheduleSchema = z.object({
+  company_id: z.number().int().positive(),
+  staff_id: z.number().int().positive(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 });
 
 export class ToolHandlers {
@@ -336,6 +380,101 @@ export class ToolHandlers {
     };
   }
 
+  // ========== Schedule CRUD Operations ==========
+
+  async createSchedule(args: unknown) {
+    try {
+      const params = CreateScheduleSchema.parse(args);
+      const { company_id, ...scheduleData } = params;
+
+      const schedule = await this.client.createSchedule(
+        company_id,
+        scheduleData
+      );
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully created schedule for staff ${params.staff_id} on ${params.date}:\nTime: ${params.time_from} - ${params.time_to}\nEntries created: ${schedule.length}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to create schedule: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
+  async updateSchedule(args: unknown) {
+    try {
+      const params = UpdateScheduleSchema.parse(args);
+      const { company_id, ...scheduleData } = params;
+
+      const schedule = await this.client.updateSchedule(
+        company_id,
+        scheduleData
+      );
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully updated schedule for staff ${params.staff_id} on ${params.date}\nEntries updated: ${schedule.length}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to update schedule: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
+  async deleteSchedule(args: unknown) {
+    try {
+      const params = DeleteScheduleSchema.parse(args);
+
+      await this.client.deleteSchedule(
+        params.company_id,
+        params.staff_id,
+        params.date
+      );
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully deleted schedule for staff ${params.staff_id} on ${params.date}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to delete schedule: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
   // ========== Staff CRUD Operations ==========
 
   async createStaff(args: unknown) {
@@ -478,6 +617,144 @@ export class ToolHandlers {
             text: `Failed to update service: ${error instanceof Error ? error.message : 'Unknown error'}`,
           },
         ],
+      };
+    }
+  }
+
+  // ========== Positions CRUD Operations ==========
+
+  async getPositions(args: unknown) {
+    try {
+      const params = z
+        .object({
+          company_id: z.number().int().positive(),
+        })
+        .parse(args);
+
+      const positions = await this.client.getPositions(params.company_id);
+
+      if (!positions || positions.length === 0) {
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: 'No positions found for this company.',
+            },
+          ],
+        };
+      }
+
+      const positionsList = positions
+        .map((p, idx) => `${idx + 1}. ${p.title} (ID: ${p.id})`)
+        .join('\n');
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Found ${positions.length} position(s):\n\n${positionsList}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to fetch positions: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
+  async createPosition(args: unknown) {
+    try {
+      const params = CreatePositionSchema.parse(args);
+      const { company_id, ...positionData } = params;
+
+      const position = await this.client.createPosition(
+        company_id,
+        positionData
+      );
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully created position:\nID: ${position.id}\nTitle: ${position.title}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to create position: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
+  async updatePosition(args: unknown) {
+    try {
+      const params = UpdatePositionSchema.parse(args);
+      const { company_id, position_id, ...updateData } = params;
+
+      const position = await this.client.updatePosition(
+        company_id,
+        position_id,
+        updateData
+      );
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully updated position ${position_id}:\nTitle: ${position.title}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to update position: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
+  async deletePosition(args: unknown) {
+    try {
+      const params = DeletePositionSchema.parse(args);
+
+      await this.client.deletePosition(params.company_id, params.position_id);
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully deleted position ${params.position_id}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to delete position: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+        isError: true,
       };
     }
   }

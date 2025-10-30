@@ -260,3 +260,28 @@ export interface UpdateBookingRequest {
   comment?: string;
   attendance?: number;
 }
+
+// Clients
+export interface AltegioClientEntity {
+  id: number;
+  name: string;
+  phone?: string;
+  email?: string;
+  surname?: string;
+  [key: string]: unknown;
+}
+
+export interface CreateClientRequest {
+  name: string;
+  phone?: string;
+  email?: string;
+  surname?: string;
+  comment?: string;
+}
+
+// Service Categories
+export interface CreateCategoryRequest {
+  title: string;
+  api_id?: string;
+  weight?: number;
+}

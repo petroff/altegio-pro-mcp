@@ -175,7 +175,7 @@ export interface CreateStaffRequest {
     phone_number: string | null;
     user_email: string;
     user_phone: string;
-    is_user_invite: number;
+    is_user_invite: boolean;
 }
 export interface UpdateStaffRequest {
     name?: string;
@@ -237,5 +237,25 @@ export interface UpdateBookingRequest {
     };
     comment?: string;
     attendance?: number;
+}
+export interface AltegioClientEntity {
+    id: number;
+    name: string;
+    phone?: string;
+    email?: string;
+    surname?: string;
+    [key: string]: unknown;
+}
+export interface CreateClientRequest {
+    name: string;
+    phone?: string;
+    email?: string;
+    surname?: string;
+    comment?: string;
+}
+export interface CreateCategoryRequest {
+    title: string;
+    api_id?: string;
+    weight?: number;
 }
 //# sourceMappingURL=altegio.types.d.ts.map

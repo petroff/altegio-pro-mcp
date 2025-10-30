@@ -32,7 +32,7 @@ const CreateStaffSchema = z.object({
     phone_number: z.string().nullable(),
     user_email: z.string().email(),
     user_phone: z.string().min(1),
-    is_user_invite: z.number().int().min(0).max(1),
+    is_user_invite: z.boolean(),
 });
 const UpdateStaffSchema = z.object({
     company_id: z.number().int().positive(),
@@ -193,7 +193,7 @@ export class ToolHandlers {
         const staffList = staff
             .map((s, idx) => `${idx + 1}. ID: ${s.id} - ${s.name}\n` +
             `   Specialization: ${s.specialization || 'N/A'}\n` +
-            `   Rating: ${s.rating !== undefined ? s.rating : 'N/A'}${s.position?.title ? `\n   Position: ${s.position.title}` : ''}`)
+            `   Rating: ${s.rating !== undefined ? s.rating : 'N/A'}${s.position?.title ? `\n   Position: ${s.position.title} (ID: ${s.position.id})` : ''}`)
             .join('\n\n');
         return {
             content: [

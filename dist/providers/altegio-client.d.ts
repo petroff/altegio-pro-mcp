@@ -44,5 +44,8 @@ export declare class AltegioClient {
     createBooking(companyId: number, data: import('../types/altegio.types.js').CreateBookingRequest): Promise<AltegioBooking>;
     updateBooking(companyId: number, recordId: number, data: import('../types/altegio.types.js').UpdateBookingRequest): Promise<AltegioBooking>;
     deleteBooking(companyId: number, recordId: number): Promise<void>;
+    createClient(companyId: number, data: import('../types/altegio.types.js').CreateClientRequest): Promise<import('../types/altegio.types.js').AltegioClientEntity>;
+    createServiceCategory(companyId: number, data: import('../types/altegio.types.js').CreateCategoryRequest): Promise<AltegioServiceCategory>;
+    isAuthenticated(): boolean;
 }
 //# sourceMappingURL=altegio-client.d.ts.map

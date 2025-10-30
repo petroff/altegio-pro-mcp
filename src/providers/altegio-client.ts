@@ -535,4 +535,76 @@ export class AltegioClient {
       );
     }
   }
+
+  // ========== Clients CRUD Operations ==========
+
+  async createClient(
+    companyId: number,
+    data: import('../types/altegio.types.js').CreateClientRequest
+  ): Promise<import('../types/altegio.types.js').AltegioClientEntity> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/clients/${companyId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to create client: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<
+      import('../types/altegio.types.js').AltegioClientEntity
+    >;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to create client: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  // ========== Service Categories CRUD Operations ==========
+
+  async createServiceCategory(
+    companyId: number,
+    data: import('../types/altegio.types.js').CreateCategoryRequest
+  ): Promise<AltegioServiceCategory> {
+    if (!this.userToken) {
+      throw new Error('Not authenticated. Use login() first.');
+    }
+
+    const response = await this.apiRequest(`/service_categories/${companyId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to create category: HTTP ${response.status} - ${errorText}`
+      );
+    }
+
+    const result = (await response.json()) as AltegioApiResponse<AltegioServiceCategory>;
+    if (!result.success || !result.data) {
+      throw new Error('Failed to create category: Invalid response');
+    }
+
+    return result.data;
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.userToken;
+  }
 }

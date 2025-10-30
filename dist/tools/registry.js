@@ -1,5 +1,8 @@
 import { CallToolRequestSchema, ListToolsRequestSchema, McpError, ErrorCode, } from '@modelcontextprotocol/sdk/types.js';
 import { ToolHandlers } from './handlers.js';
+import { OnboardingHandlers } from './onboarding-handlers.js';
+import { OnboardingStateManager } from '../providers/onboarding-state-manager.js';
+import { onboardingTools } from './onboarding-registry.js';
 const tools = [
     {
         name: 'altegio_login',
@@ -187,8 +190,8 @@ const tools = [
                     description: 'User phone number',
                 },
                 is_user_invite: {
-                    type: 'number',
-                    description: 'User invitation flag (0 or 1)',
+                    type: 'boolean',
+                    description: 'User invitation flag',
                 },
             },
             required: ['company_id', 'name', 'specialization', 'position_id', 'phone_number', 'user_email', 'user_phone', 'is_user_invite'],
@@ -357,10 +360,14 @@ const tools = [
 ];
 export function registerTools(server, client) {
     const handlers = new ToolHandlers(client);
+    const stateManager = new OnboardingStateManager();
+    const onboardingHandlers = new OnboardingHandlers(client, stateManager);
+    // Combine all tools
+    const allTools = [...tools, ...onboardingTools];
     // Register list handler
     server.setRequestHandler(ListToolsRequestSchema, async () => {
         return {
-            tools: tools.map((t) => ({
+            tools: allTools.map((t) => ({
                 name: t.name,
                 description: t.description,
                 inputSchema: t.inputSchema,
@@ -404,6 +411,27 @@ export function registerTools(server, client) {
                     return await handlers.updateBooking(args);
                 case 'delete_booking':
                     return await handlers.deleteBooking(args);
+                // Onboarding tools
+                case 'onboarding_start':
+                    return await onboardingHandlers.start(args);
+                case 'onboarding_resume':
+                    return await onboardingHandlers.resume(args);
+                case 'onboarding_status':
+                    return await onboardingHandlers.status(args);
+                case 'onboarding_add_staff_batch':
+                    return await onboardingHandlers.addStaffBatch(args);
+                case 'onboarding_add_services_batch':
+                    return await onboardingHandlers.addServicesBatch(args);
+                case 'onboarding_add_categories':
+                    return await onboardingHandlers.addCategories(args);
+                case 'onboarding_import_clients':
+                    return await onboardingHandlers.importClients(args);
+                case 'onboarding_create_test_bookings':
+                    return await onboardingHandlers.createTestBookings(args);
+                case 'onboarding_preview_data':
+                    return await onboardingHandlers.previewData(args);
+                case 'onboarding_rollback_phase':
+                    return await onboardingHandlers.rollbackPhase(args);
                 default:
                     throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
             }
@@ -415,6 +443,6 @@ export function registerTools(server, client) {
             throw new McpError(ErrorCode.InternalError, error instanceof Error ? error.message : 'Unknown error');
         }
     });
-    return tools.map((t) => t.name);
+    return allTools.map((t) => t.name);
 }
 //# sourceMappingURL=registry.js.map

@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { OnboardingState, OnboardingPhase, Checkpoint } from '../types/onboarding.types';
-import { logger } from '../utils/logger';
+import { OnboardingState, OnboardingPhase, Checkpoint } from '../types/onboarding.types.js';
+import { logger } from '../utils/logger.js';
 
 export class OnboardingStateManager {
   private baseDir: string;

@@ -339,5 +339,52 @@ export class AltegioClient {
             throw new Error(`Failed to delete booking: HTTP ${response.status} - ${errorText}`);
         }
     }
+    // ========== Clients CRUD Operations ==========
+    async createClient(companyId, data) {
+        if (!this.userToken) {
+            throw new Error('Not authenticated. Use login() first.');
+        }
+        const response = await this.apiRequest(`/clients/${companyId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to create client: HTTP ${response.status} - ${errorText}`);
+        }
+        const result = (await response.json());
+        if (!result.success || !result.data) {
+            throw new Error('Failed to create client: Invalid response');
+        }
+        return result.data;
+    }
+    // ========== Service Categories CRUD Operations ==========
+    async createServiceCategory(companyId, data) {
+        if (!this.userToken) {
+            throw new Error('Not authenticated. Use login() first.');
+        }
+        const response = await this.apiRequest(`/service_categories/${companyId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to create category: HTTP ${response.status} - ${errorText}`);
+        }
+        const result = (await response.json());
+        if (!result.success || !result.data) {
+            throw new Error('Failed to create category: Invalid response');
+        }
+        return result.data;
+    }
+    isAuthenticated() {
+        return !!this.userToken;
+    }
 }
 //# sourceMappingURL=altegio-client.js.map

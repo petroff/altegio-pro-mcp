@@ -42,16 +42,16 @@ export const StaffBatchItemSchema = z.object({
   specialization: z.string().optional(),
   phone: z.string().optional(),
   email: z.string().email().optional(),
-  position_id: z.number().optional(),
+  position_id: z.coerce.number().optional(),
   api_id: z.string().optional()
 });
 
 export const ServiceBatchItemSchema = z.object({
   title: z.string().min(1),
-  price_min: z.number(),
-  price_max: z.number().optional(),
-  duration: z.number(),
-  category_id: z.number().optional(),
+  price_min: z.coerce.number(),
+  price_max: z.coerce.number().optional(),
+  duration: z.coerce.number(),
+  category_id: z.coerce.number().optional(),
   api_id: z.string().optional()
 });
 

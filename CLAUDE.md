@@ -67,7 +67,7 @@ Always check BUILD.md / never add it to Git
 
 MCP server for **B2B business management only** (Altegio.Pro, not public booking /b2c). Local service business business owners, admins and team members manage their operations through authenticated tools
 
-### Tools Available (11 total + 8 CRUD + 10 onboarding = 29 total)
+### Tools Available (11 total + 12 CRUD + 10 onboarding = 33 total)
 
 **Authentication (no auth needed):**
 - `altegio_login(email, password)` - Get user_token, save credentials locally
@@ -82,6 +82,10 @@ MCP server for **B2B business management only** (Altegio.Pro, not public booking
 - `create_schedule(company_id, staff_id, date, time_from, time_to)` - Create work schedule
 - `update_schedule(company_id, staff_id, date, time_from, time_to)` - Update work schedule
 - `delete_schedule(company_id, staff_id, date)` - Delete work schedule
+- `get_positions(company_id)` - List company positions
+- `create_position(company_id, title)` - Create position
+- `update_position(company_id, position_id, title)` - Update position
+- `delete_position(company_id, position_id)` - Delete position
 - `get_service_categories(company_id)` - Service categories (public endpoint only)
 
 ### Architecture
@@ -109,6 +113,13 @@ MCP server for **B2B business management only** (Altegio.Pro, not public booking
 - `src/utils/` - logging, errors, config, credential manager
 
 ### Change history
+
+**Positions Management CRUD (2025-10-30)**
+- **Added 4 tools:** get_positions, create_position, update_position, delete_position
+- Full CRUD for staff positions/roles (Manager, Stylist, Receptionist, etc.)
+- Essential for onboarding - positions must be created before assigning staff
+- Uses /positions/{company_id} endpoints
+- All operations require user_token authentication
 
 **Schedule Management CRUD (2025-10-30)**
 - **Added 3 tools:** create_schedule, update_schedule, delete_schedule

@@ -276,6 +276,60 @@ const tools: ToolDefinition[] = [
     },
   },
   {
+    name: 'get_positions',
+    description:
+      'Get list of positions in company. AUTHENTICATION REQUIRED. Returns all available positions that can be assigned to staff members.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'Company ID' },
+      },
+      required: ['company_id'],
+    },
+  },
+  {
+    name: 'create_position',
+    description:
+      'Create a new position. AUTHENTICATION REQUIRED. Positions are used to categorize staff roles (e.g., "Manager", "Stylist", "Receptionist").',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'Company ID' },
+        title: { type: 'string', description: 'Position title' },
+        api_id: { type: 'string', description: 'External API ID (optional)' },
+      },
+      required: ['company_id', 'title'],
+    },
+  },
+  {
+    name: 'update_position',
+    description:
+      'Update existing position. AUTHENTICATION REQUIRED. Modify position title or external ID.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'Company ID' },
+        position_id: { type: 'number', description: 'Position ID' },
+        title: { type: 'string', description: 'New position title' },
+        api_id: { type: 'string', description: 'External API ID (optional)' },
+      },
+      required: ['company_id', 'position_id'],
+    },
+  },
+  {
+    name: 'delete_position',
+    description:
+      'Delete position. AUTHENTICATION REQUIRED. Note: Cannot delete positions that are assigned to staff members.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        company_id: { type: 'number', description: 'Company ID' },
+        position_id: { type: 'number', description: 'Position ID to delete' },
+      },
+      required: ['company_id', 'position_id'],
+    },
+  },
+  {
     name: 'create_staff',
     description:
       'Create a new employee/staff member. AUTHENTICATION REQUIRED. Required fields: name, specialization, position_id, phone_number, user_email, user_phone, is_user_invite.',
@@ -527,6 +581,14 @@ export function registerTools(server: Server, client: AltegioClient): string[] {
           return await handlers.updateSchedule(args);
         case 'delete_schedule':
           return await handlers.deleteSchedule(args);
+        case 'get_positions':
+          return await handlers.getPositions(args);
+        case 'create_position':
+          return await handlers.createPosition(args);
+        case 'update_position':
+          return await handlers.updatePosition(args);
+        case 'delete_position':
+          return await handlers.deletePosition(args);
         case 'create_staff':
           return await handlers.createStaff(args);
         case 'update_staff':

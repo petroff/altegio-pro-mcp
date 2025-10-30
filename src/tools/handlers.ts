@@ -83,6 +83,25 @@ const UpdateServiceSchema = z.object({
   active: z.number().int().min(0).max(1).optional(),
 });
 
+// ========== Positions CRUD Schemas ==========
+const CreatePositionSchema = z.object({
+  company_id: z.number().int().positive(),
+  title: z.string().min(1),
+  api_id: z.string().optional(),
+});
+
+const UpdatePositionSchema = z.object({
+  company_id: z.number().int().positive(),
+  position_id: z.number().int().positive(),
+  title: z.string().min(1).optional(),
+  api_id: z.string().optional(),
+});
+
+const DeletePositionSchema = z.object({
+  company_id: z.number().int().positive(),
+  position_id: z.number().int().positive(),
+});
+
 // ========== Bookings CRUD Schemas ==========
 const CreateBookingSchema = z.object({
   company_id: z.number().int().positive(),
@@ -598,6 +617,144 @@ export class ToolHandlers {
             text: `Failed to update service: ${error instanceof Error ? error.message : 'Unknown error'}`,
           },
         ],
+      };
+    }
+  }
+
+  // ========== Positions CRUD Operations ==========
+
+  async getPositions(args: unknown) {
+    try {
+      const params = z
+        .object({
+          company_id: z.number().int().positive(),
+        })
+        .parse(args);
+
+      const positions = await this.client.getPositions(params.company_id);
+
+      if (!positions || positions.length === 0) {
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: 'No positions found for this company.',
+            },
+          ],
+        };
+      }
+
+      const positionsList = positions
+        .map((p, idx) => `${idx + 1}. ${p.title} (ID: ${p.id})`)
+        .join('\n');
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Found ${positions.length} position(s):\n\n${positionsList}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to fetch positions: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
+  async createPosition(args: unknown) {
+    try {
+      const params = CreatePositionSchema.parse(args);
+      const { company_id, ...positionData } = params;
+
+      const position = await this.client.createPosition(
+        company_id,
+        positionData
+      );
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully created position:\nID: ${position.id}\nTitle: ${position.title}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to create position: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
+  async updatePosition(args: unknown) {
+    try {
+      const params = UpdatePositionSchema.parse(args);
+      const { company_id, position_id, ...updateData } = params;
+
+      const position = await this.client.updatePosition(
+        company_id,
+        position_id,
+        updateData
+      );
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully updated position ${position_id}:\nTitle: ${position.title}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to update position: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
+  async deletePosition(args: unknown) {
+    try {
+      const params = DeletePositionSchema.parse(args);
+
+      await this.client.deletePosition(params.company_id, params.position_id);
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Successfully deleted position ${params.position_id}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to delete position: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+        isError: true,
       };
     }
   }

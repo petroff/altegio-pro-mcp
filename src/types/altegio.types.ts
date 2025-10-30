@@ -135,6 +135,13 @@ export interface AltegioError extends Error {
 
 // Public booking API types (no user auth required)
 
+export interface AltegioPosition {
+  id: number;
+  title: string;
+  api_id?: string | null;
+  [key: string]: unknown;
+}
+
 export interface AltegioStaff {
   id: number;
   api_id?: string | null;
@@ -301,4 +308,15 @@ export interface CreateCategoryRequest {
   title: string;
   api_id?: string;
   weight?: number;
+}
+
+// Positions
+export interface CreatePositionRequest {
+  title: string;
+  api_id?: string;
+}
+
+export interface UpdatePositionRequest {
+  title?: string;
+  api_id?: string;
 }

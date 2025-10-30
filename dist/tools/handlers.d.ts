@@ -119,6 +119,58 @@ export declare class ToolHandlers {
             text: string;
         }[];
     }>;
+    getPositions(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
+    createPosition(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
+    updatePosition(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
+    deletePosition(args: unknown): Promise<{
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: "text";
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
     createBooking(args: unknown): Promise<{
         content: {
             type: "text";

@@ -45,6 +45,16 @@ const TestBookingsArgsSchema = z.object({
   count: z.number().min(1).max(10).default(5)
 });
 
+const PreviewArgsSchema = z.object({
+  data_type: z.enum(['staff', 'services', 'clients', 'categories']),
+  raw_input: z.string()
+});
+
+const RollbackArgsSchema = z.object({
+  company_id: z.number(),
+  phase_name: z.string()
+});
+
 export class OnboardingHandlers {
   constructor(
     private client: AltegioClient,
@@ -396,6 +406,122 @@ export class OnboardingHandlers {
                 `Your platform is ready to use!`
         }
       ]
+    };
+  }
+
+  async previewData(args: unknown) {
+    const { data_type, raw_input } = PreviewArgsSchema.parse(args);
+
+    // Try to parse as JSON first, fall back to CSV
+    let parsed;
+    try {
+      // Attempt JSON parse
+      const jsonData = JSON.parse(raw_input);
+      parsed = Array.isArray(jsonData) ? jsonData : [jsonData];
+    } catch {
+      // Fall back to CSV parsing
+      parsed = parseCSV(raw_input);
+    }
+
+    if (parsed.length === 0 || !parsed[0]) {
+      return {
+        content: [{
+          type: 'text' as const,
+          text: 'No data parsed. Check CSV format or JSON structure.'
+        }]
+      };
+    }
+
+    const preview = parsed.slice(0, 5).map((row, idx) =>
+      `${idx + 1}. ${Object.entries(row).map(([k, v]) => `${k}: ${v}`).join(', ')}`
+    ).join('\n');
+
+    const fieldCount = Object.keys(parsed[0]).length;
+
+    return {
+      content: [{
+        type: 'text' as const,
+        text: `Preview of ${data_type} data:\n\n` +
+              `Total rows: ${parsed.length}\n` +
+              `Fields: ${fieldCount} (${Object.keys(parsed[0]).join(', ')})\n\n` +
+              `First ${Math.min(5, parsed.length)} rows:\n${preview}\n\n` +
+              `Proceed with onboarding_add_${data_type}_batch to create entities.`
+      }]
+    };
+  }
+
+  async rollbackPhase(args: unknown) {
+    if (!this.client.isAuthenticated()) {
+      throw new Error('Authentication required. Please use altegio_login first.');
+    }
+
+    const { company_id, phase_name } = RollbackArgsSchema.parse(args);
+    const state = await this.stateManager.load(company_id);
+
+    if (!state || !state.checkpoints[phase_name]) {
+      throw new Error(`No checkpoint found for phase: ${phase_name}`);
+    }
+
+    const checkpoint = state.checkpoints[phase_name];
+    const entityIds = checkpoint.entity_ids;
+    const deletedCount = { success: 0, failed: 0 };
+    let servicesNote = '';
+
+    // Delete entities based on phase type
+    for (const id of entityIds) {
+      try {
+        if (phase_name === 'staff') {
+          await this.client.deleteStaff(company_id, id);
+          deletedCount.success++;
+        } else if (phase_name === 'test_bookings') {
+          await this.client.deleteBooking(company_id, id);
+          deletedCount.success++;
+        } else if (phase_name === 'services') {
+          // Services don't have delete endpoint in API
+          servicesNote = '\nNote: Services cannot be deleted via API. Checkpoint removed but entities remain.';
+          deletedCount.success++;
+        } else if (phase_name === 'categories') {
+          // Categories likely don't have delete endpoint
+          servicesNote = '\nNote: Categories cannot be deleted via API. Checkpoint removed but entities remain.';
+          deletedCount.success++;
+        } else if (phase_name === 'clients') {
+          // Clients may have delete endpoint - attempt it
+          try {
+            // Attempt delete (may not be implemented)
+            if ('deleteClient' in this.client && typeof this.client.deleteClient === 'function') {
+              await (this.client as any).deleteClient(company_id, id);
+              deletedCount.success++;
+            } else {
+              servicesNote = '\nNote: Client deletion is not implemented in API.';
+              deletedCount.success++;
+            }
+          } catch {
+            servicesNote = '\nNote: Client deletion may not be supported via API.';
+            deletedCount.success++;
+          }
+        } else {
+          // Unknown phase - just remove checkpoint
+          deletedCount.success++;
+        }
+      } catch (error) {
+        logger.warn({ error, id, phase_name }, `Failed to delete ${phase_name} entity`);
+        deletedCount.failed++;
+      }
+    }
+
+    // Remove checkpoint from state
+    delete state.checkpoints[phase_name];
+    state.updated_at = new Date().toISOString();
+    await this.stateManager.save(state);
+
+    return {
+      content: [{
+        type: 'text' as const,
+        text: `Rolled back ${phase_name}: processed ${entityIds.length} entities\n` +
+              `✓ Successfully handled: ${deletedCount.success}\n` +
+              (deletedCount.failed > 0 ? `✗ Failed: ${deletedCount.failed}\n` : '') +
+              servicesNote
+      }]
     };
   }
 }

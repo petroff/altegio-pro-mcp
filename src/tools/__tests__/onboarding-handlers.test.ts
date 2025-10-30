@@ -201,4 +201,104 @@ describe('Onboarding Handlers', () => {
         .rejects.toThrow('No staff or services found');
     });
   });
+
+  describe('previewData', () => {
+    it('should parse and show CSV preview', async () => {
+      const csv = 'name,phone\nAlice,+1234567890\nBob,+0987654321';
+
+      const result = await handlers.previewData({
+        data_type: 'staff',
+        raw_input: csv
+      });
+
+      const textContent = result.content[0]?.text;
+      expect(textContent).toContain('Alice');
+      expect(textContent).toContain('+1234567890');
+      expect(textContent).toContain('Fields: 2');
+      expect(textContent).toContain('Total rows: 2');
+    });
+
+    it('should show JSON preview', async () => {
+      const json = JSON.stringify([
+        { name: 'Alice', phone: '+1234567890' },
+        { name: 'Bob', phone: '+0987654321' }
+      ]);
+
+      const result = await handlers.previewData({
+        data_type: 'staff',
+        raw_input: json
+      });
+
+      const textContent = result.content[0]?.text;
+      expect(textContent).toContain('Total rows: 2');
+    });
+
+    it('should handle empty data', async () => {
+      const result = await handlers.previewData({
+        data_type: 'staff',
+        raw_input: ''
+      });
+
+      expect(result.content[0]?.text).toContain('No data parsed');
+    });
+  });
+
+  describe('rollbackPhase', () => {
+    it('should delete staff entities and reset checkpoint', async () => {
+      await handlers.start({ company_id: 123 });
+      await stateManager.checkpoint(123, 'staff', [1, 2, 3]);
+
+      mockClient.deleteStaff = jest.fn().mockResolvedValue(true);
+
+      const result = await handlers.rollbackPhase({
+        company_id: 123,
+        phase_name: 'staff'
+      });
+
+      expect(mockClient.deleteStaff).toHaveBeenCalledTimes(3);
+      expect(result.content[0]?.text).toContain('Rolled back staff');
+      expect(result.content[0]?.text).toContain('3 entities');
+
+      // Verify checkpoint was removed
+      const state = await stateManager.load(123);
+      expect(state?.checkpoints['staff']).toBeUndefined();
+    });
+
+    it('should delete booking entities', async () => {
+      await handlers.start({ company_id: 123 });
+      await stateManager.checkpoint(123, 'test_bookings', [100, 101]);
+
+      mockClient.deleteBooking = jest.fn().mockResolvedValue(true);
+
+      const result = await handlers.rollbackPhase({
+        company_id: 123,
+        phase_name: 'test_bookings'
+      });
+
+      expect(mockClient.deleteBooking).toHaveBeenCalledTimes(2);
+      expect(result.content[0]?.text).toContain('Rolled back test_bookings');
+    });
+
+    it('should handle services (no delete API)', async () => {
+      await handlers.start({ company_id: 123 });
+      await stateManager.checkpoint(123, 'services', [20, 21]);
+
+      const result = await handlers.rollbackPhase({
+        company_id: 123,
+        phase_name: 'services'
+      });
+
+      expect(result.content[0]?.text).toContain('Rolled back services');
+      expect(result.content[0]?.text).toContain('Note: Services cannot be deleted via API');
+    });
+
+    it('should reject if no checkpoint exists', async () => {
+      await handlers.start({ company_id: 123 });
+
+      await expect(handlers.rollbackPhase({
+        company_id: 123,
+        phase_name: 'staff'
+      })).rejects.toThrow('No checkpoint found');
+    });
+  });
 });

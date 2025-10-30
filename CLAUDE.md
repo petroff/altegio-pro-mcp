@@ -67,26 +67,19 @@ Always check BUILD.md / never add it to Git
 
 MCP server for **B2B business management only** (Altegio.Pro, not public booking /b2c). Local service business business owners, admins and team members manage their operations through authenticated tools
 
-### Tools Available (11 total + 12 CRUD + 10 onboarding = 33 total)
+### Tools Available (33 total)
 
-**Authentication (no auth needed):**
-- `altegio_login(email, password)` - Get user_token, save credentials locally
-- `altegio_logout()` - Clear credentials
+**Category-organized with [Prefix] tags for LLM navigation:**
 
-**Business Management (all require user_token):**
-- `list_companies(my=1)` - Companies user manages
-- `get_bookings(company_id, start_date, end_date)` - Appointments/records
-- `get_staff(company_id)` - Staff list with admin details
-- `get_services(company_id)` - Services with full config
-- `get_schedule(company_id, staff_id, start_date, end_date)` - View employee schedule
-- `create_schedule(company_id, staff_id, date, time_from, time_to)` - Create work schedule
-- `update_schedule(company_id, staff_id, date, time_from, time_to)` - Update work schedule
-- `delete_schedule(company_id, staff_id, date)` - Delete work schedule
-- `get_positions(company_id)` - List company positions
-- `create_position(company_id, title)` - Create position
-- `update_position(company_id, position_id, title)` - Update position
-- `delete_position(company_id, position_id)` - Delete position
-- `get_service_categories(company_id)` - Service categories (public endpoint only)
+**[Auth] Authentication (2):** login, logout
+**[Company] Company (1):** list_companies
+**[Staff] Staff CRUD (4):** get, create, update, delete
+**[Positions] Positions CRUD (4):** get, create, update, delete
+**[Services] Services (3):** get, create, update
+**[Categories] Service Categories (1):** get
+**[Schedule] Schedule CRUD (4):** get, create, update, delete
+**[Bookings] Bookings CRUD (4):** get, create, update, delete
+**[Onboarding] Wizard (10):** start, resume, status, batch imports, preview, rollback
 
 ### Architecture
 

@@ -23,42 +23,57 @@ MCP server for Altegio.Pro business management API - B2B integration for salon/s
 
 ## Available Tools
 
-| Tool | Description | Auth Required |
-|------|-------------|---------------|
-| `altegio_login` | Authenticate with email/password | No |
-| `altegio_logout` | Clear stored credentials | No |
-| `list_companies` | Get managed companies | Yes |
-| `get_bookings` | View company appointments | Yes |
-| `get_staff` | View staff with admin details | Yes |
-| `get_services` | View services with configuration | Yes |
-| `get_service_categories` | View service categories | Yes |
-| `get_schedule` | View employee schedules | Yes |
-| `create_schedule` | Create employee work schedule | Yes |
-| `update_schedule` | Update employee work schedule | Yes |
-| `delete_schedule` | Delete employee work schedule | Yes |
-| `get_positions` | Get company positions | Yes |
-| `create_position` | Create new position | Yes |
-| `update_position` | Update position | Yes |
-| `delete_position` | Delete position | Yes |
-| `create_staff` | Create new employee | Yes |
-| `update_staff` | Update employee details | Yes |
-| `delete_staff` | Remove employee | Yes |
-| `create_service` | Create new service | Yes |
-| `update_service` | Update service details | Yes |
-| `create_booking` | Create client appointment | Yes |
-| `update_booking` | Modify existing appointment | Yes |
-| `delete_booking` | Cancel appointment | Yes |
-| **Onboarding Wizard** | | |
-| `onboarding_start` | Initialize onboarding session | Yes |
-| `onboarding_resume` | Resume interrupted onboarding | Yes |
-| `onboarding_status` | Check onboarding progress | Yes |
-| `onboarding_add_categories` | Bulk create service categories | Yes |
-| `onboarding_add_staff_batch` | Bulk import staff (CSV/JSON) | Yes |
-| `onboarding_add_services_batch` | Bulk import services (CSV/JSON) | Yes |
-| `onboarding_import_clients` | Import client database | Yes |
-| `onboarding_create_test_bookings` | Generate sample bookings | Yes |
-| `onboarding_preview_data` | Validate data before import | Yes |
-| `onboarding_rollback_phase` | Undo specific onboarding phase | Yes |
+**33 tools organized by category** for complete business management:
+
+### 🔐 Authentication
+- `altegio_login` - Authenticate with email/password
+- `altegio_logout` - Clear stored credentials
+
+### 🏢 Company Management
+- `list_companies` - Get managed companies (requires auth)
+
+### 👥 Staff Management
+- `get_staff` - View employees with admin details
+- `create_staff` - Add new employee
+- `update_staff` - Modify employee details
+- `delete_staff` - Remove employee
+
+### 📋 Positions Management
+- `get_positions` - List company positions/roles
+- `create_position` - Create new position (Manager, Stylist, etc.)
+- `update_position` - Modify position details
+- `delete_position` - Remove position
+
+### 🛎️ Services Management
+- `get_services` - View all services with configuration
+- `get_service_categories` - View service categories
+- `create_service` - Add new service
+- `update_service` - Modify service details
+
+### 📅 Schedule Management
+- `get_schedule` - View employee work schedules
+- `create_schedule` - Set employee work hours
+- `update_schedule` - Modify work schedule
+- `delete_schedule` - Remove schedule entry
+
+### 📖 Bookings Management
+- `get_bookings` - View appointments
+- `create_booking` - Create client appointment
+- `update_booking` - Modify existing appointment
+- `delete_booking` - Cancel appointment
+
+### 🚀 Onboarding Wizard
+**Conversational first-time setup assistant:**
+- `onboarding_start` - Initialize setup session
+- `onboarding_resume` - Resume interrupted setup
+- `onboarding_status` - Check progress
+- `onboarding_add_categories` - Bulk create service categories
+- `onboarding_add_staff_batch` - Bulk import staff (CSV/JSON)
+- `onboarding_add_services_batch` - Bulk import services (CSV/JSON)
+- `onboarding_import_clients` - Import client database
+- `onboarding_create_test_bookings` - Generate sample data
+- `onboarding_preview_data` - Validate before import
+- `onboarding_rollback_phase` - Undo specific phase
 
 **Note:** Services DELETE operation is not available in Altegio API. All write operations require user authentication via `altegio_login`. See [Onboarding Guide](docs/ONBOARDING_GUIDE.md) for first-time setup workflows.
 

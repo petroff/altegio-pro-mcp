@@ -11,7 +11,7 @@ interface ToolDefinition {
 export const onboardingTools: ToolDefinition[] = [
   {
     name: 'onboarding_start',
-    description: 'Initialize new onboarding session for a company. Creates persistent state and guides through platform setup workflow.',
+    description: '[Onboarding] Initialize new onboarding session for a company. Creates persistent state and guides through platform setup workflow.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -22,7 +22,7 @@ export const onboardingTools: ToolDefinition[] = [
   },
   {
     name: 'onboarding_resume',
-    description: 'Resume existing onboarding session and show progress. Displays completed phases and next steps.',
+    description: '[Onboarding] Resume existing onboarding session and show progress. Displays completed phases and next steps.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -132,7 +132,7 @@ export const onboardingTools: ToolDefinition[] = [
   },
   {
     name: 'onboarding_import_clients',
-    description: 'Import client database from CSV string. CSV must have headers: name,phone,email,surname,comment. Either phone or email is required. Creates checkpoint for rollback.',
+    description: '[Onboarding] Import client database from CSV string. CSV must have headers: name,phone,email,surname,comment. Either phone or email is required. Creates checkpoint for rollback.',
     inputSchema: {
       type: 'object',
       properties: {

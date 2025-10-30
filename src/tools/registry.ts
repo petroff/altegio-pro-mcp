@@ -25,7 +25,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'altegio_login',
     description:
-      'Login to Altegio with email and password. REQUIRED for administrative operations: getting user companies (list_companies with my=1), viewing bookings, and other business management tasks. Ask user for credentials when they request administrative data.',
+      '[Auth] Login to Altegio with email and password. REQUIRED for administrative operations: getting user companies (list_companies with my=1), viewing bookings, and other business management tasks. Ask user for credentials when they request administrative data.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -37,7 +37,7 @@ const tools: ToolDefinition[] = [
   },
   {
     name: 'altegio_logout',
-    description: 'Logout from Altegio and clear stored credentials.',
+    description: '[Auth] Logout from Altegio and clear stored credentials.',
     inputSchema: {
       type: 'object',
       properties: {},
@@ -46,7 +46,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'list_companies',
     description:
-      'Get list of companies. AUTHENTICATION REQUIRED when my=1 (to get companies user manages). PUBLIC when my=0 or omitted (all companies). If user asks about "their" or "my" companies, use my=1 and ensure user is logged in first. After getting user companies, ask which company they want to work with if not specified. PAGINATION STRATEGY: Default returns 200 companies (can overwhelm context). RECOMMENDED: Start with count=20-50 for initial results. Show user first batch, ask if they need more or can identify their company. Only increase count if user explicitly needs full list. Maximum count=300. Use page parameter to fetch next batches. This approach saves context and computation.',
+      '[Company] Get list of companies. AUTHENTICATION REQUIRED when my=1 (to get companies user manages). PUBLIC when my=0 or omitted (all companies). If user asks about "their" or "my" companies, use my=1 and ensure user is logged in first. After getting user companies, ask which company they want to work with if not specified. PAGINATION STRATEGY: Default returns 200 companies (can overwhelm context). RECOMMENDED: Start with count=20-50 for initial results. Show user first batch, ask if they need more or can identify their company. Only increase count if user explicitly needs full list. Maximum count=300. Use page parameter to fetch next batches. This approach saves context and computation.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -72,7 +72,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'get_bookings',
     description:
-      'Get bookings for a company. AUTHENTICATION REQUIRED - this is administrative data. User must be logged in and have access to the company. If company_id not known, first call list_companies with my=1 to get user companies, then ask user to choose one. PAGINATION STRATEGY: Default may return many bookings. RECOMMENDED: Start with count=20-50 for recent bookings. Use start_date/end_date to filter by date range. Show first batch to user, fetch more only if needed. This saves context and computation.',
+      '[Bookings] Get bookings for a company. AUTHENTICATION REQUIRED - this is administrative data. User must be logged in and have access to the company. If company_id not known, first call list_companies with my=1 to get user companies, then ask user to choose one. PAGINATION STRATEGY: Default may return many bookings. RECOMMENDED: Start with count=20-50 for recent bookings. Use start_date/end_date to filter by date range. Show first batch to user, fetch more only if needed. This saves context and computation.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -107,7 +107,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'get_staff',
     description:
-      'Get list of staff members for a company. AUTHENTICATION REQUIRED - administrative access to view all staff with full details (not just public booking info). User must be logged in and have access to the company. PAGINATION STRATEGY: May return many staff (100+). RECOMMENDED: Start with count=30-50 to show initial options. User can browse and request more if needed. This saves context for large salons.',
+      '[Staff] Get list of staff members for a company. AUTHENTICATION REQUIRED - administrative access to view all staff with full details (not just public booking info). User must be logged in and have access to the company. PAGINATION STRATEGY: May return many staff (100+). RECOMMENDED: Start with count=30-50 to show initial options. User can browse and request more if needed. This saves context for large salons.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -132,7 +132,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'get_services',
     description:
-      'Get list of services available at a company. AUTHENTICATION REQUIRED - administrative access to view all services with full pricing, settings, and configuration (not just public booking info). User must be logged in and have access to the company. PAGINATION STRATEGY: May return many services (50+). RECOMMENDED: Start with count=30-50 to show main services. User can request more or use categories for better organization.',
+      '[Services] Get list of services available at a company. AUTHENTICATION REQUIRED - administrative access to view all services with full pricing, settings, and configuration (not just public booking info). User must be logged in and have access to the company. PAGINATION STRATEGY: May return many services (50+). RECOMMENDED: Start with count=30-50 to show main services. User can request more or use categories for better organization.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -157,7 +157,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'get_service_categories',
     description:
-      'Get list of service categories at a company. PUBLIC API - NO AUTHENTICATION REQUIRED. Use this for online booking - shows how services are organized. PAGINATION STRATEGY: May return many categories (20+). RECOMMENDED: Start with count=20-30. Categories help organize services, so showing initial set is usually sufficient.',
+      '[Categories] Get list of service categories at a company. PUBLIC API - NO AUTHENTICATION REQUIRED. Use this for online booking - shows how services are organized. PAGINATION STRATEGY: May return many categories (20+). RECOMMENDED: Start with count=20-30. Categories help organize services, so showing initial set is usually sufficient.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -182,7 +182,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'get_schedule',
     description:
-      'Get employee schedule for a date range. AUTHENTICATION REQUIRED - administrative access to view staff working schedule. User must be logged in and have access to the company. Returns schedule entries with dates, times, and session lengths.',
+      '[Schedule] Get employee schedule for a date range. AUTHENTICATION REQUIRED - administrative access to view staff working schedule. User must be logged in and have access to the company. Returns schedule entries with dates, times, and session lengths.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -203,7 +203,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'create_schedule',
     description:
-      'Create employee work schedule. AUTHENTICATION REQUIRED - administrative access to create staff working schedule. Defines when an employee is available to work (e.g., "Monday 9:00-18:00"). Use this to set up or modify work hours.',
+      '[Schedule] Create employee work schedule. AUTHENTICATION REQUIRED - administrative access to create staff working schedule. Defines when an employee is available to work (e.g., "Monday 9:00-18:00"). Use this to set up or modify work hours.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -232,7 +232,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'update_schedule',
     description:
-      'Update employee work schedule. AUTHENTICATION REQUIRED - administrative access to modify staff working schedule. Updates existing work hours for a specific date.',
+      '[Schedule] Update employee work schedule. AUTHENTICATION REQUIRED - administrative access to modify staff working schedule. Updates existing work hours for a specific date.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -261,7 +261,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'delete_schedule',
     description:
-      'Delete employee work schedule for a specific date. AUTHENTICATION REQUIRED - administrative access to remove staff working schedule. Removes work hours for the specified date.',
+      '[Schedule] Delete employee work schedule for a specific date. AUTHENTICATION REQUIRED - administrative access to remove staff working schedule. Removes work hours for the specified date.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -278,7 +278,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'get_positions',
     description:
-      'Get list of positions in company. AUTHENTICATION REQUIRED. Returns all available positions that can be assigned to staff members.',
+      '[Positions] Get list of positions in company. AUTHENTICATION REQUIRED. Returns all available positions that can be assigned to staff members.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -290,7 +290,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'create_position',
     description:
-      'Create a new position. AUTHENTICATION REQUIRED. Positions are used to categorize staff roles (e.g., "Manager", "Stylist", "Receptionist").',
+      '[Positions] Create a new position. AUTHENTICATION REQUIRED. Positions are used to categorize staff roles (e.g., "Manager", "Stylist", "Receptionist").',
     inputSchema: {
       type: 'object',
       properties: {
@@ -304,7 +304,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'update_position',
     description:
-      'Update existing position. AUTHENTICATION REQUIRED. Modify position title or external ID.',
+      '[Positions] Update existing position. AUTHENTICATION REQUIRED. Modify position title or external ID.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -319,7 +319,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'delete_position',
     description:
-      'Delete position. AUTHENTICATION REQUIRED. Note: Cannot delete positions that are assigned to staff members.',
+      '[Positions] Delete position. AUTHENTICATION REQUIRED. Note: Cannot delete positions that are assigned to staff members.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -332,7 +332,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'create_staff',
     description:
-      'Create a new employee/staff member. AUTHENTICATION REQUIRED. Required fields: name, specialization, position_id, phone_number, user_email, user_phone, is_user_invite.',
+      '[Staff] Create a new employee/staff member. AUTHENTICATION REQUIRED. Required fields: name, specialization, position_id, phone_number, user_email, user_phone, is_user_invite.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -368,7 +368,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'update_staff',
     description:
-      'Update existing employee/staff member. AUTHENTICATION REQUIRED. Provide only fields to update.',
+      '[Staff] Update existing employee/staff member. AUTHENTICATION REQUIRED. Provide only fields to update.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -387,7 +387,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'delete_staff',
     description:
-      'Delete/remove employee/staff member. AUTHENTICATION REQUIRED.',
+      '[Staff] Delete/remove employee/staff member. AUTHENTICATION REQUIRED.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -400,7 +400,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'create_service',
     description:
-      'Create a new service. AUTHENTICATION REQUIRED. Required fields: title, category_id.',
+      '[Services] Create a new service. AUTHENTICATION REQUIRED. Required fields: title, category_id.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -420,7 +420,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'update_service',
     description:
-      'Update existing service. AUTHENTICATION REQUIRED. Provide only fields to update.',
+      '[Services] Update existing service. AUTHENTICATION REQUIRED. Provide only fields to update.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -441,7 +441,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'create_booking',
     description:
-      'Create a new client booking/appointment. AUTHENTICATION REQUIRED. Required fields: staff_id, services, datetime, client info.',
+      '[Bookings] Create a new client booking/appointment. AUTHENTICATION REQUIRED. Required fields: staff_id, services, datetime, client info.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -484,7 +484,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'update_booking',
     description:
-      'Update existing booking/appointment. AUTHENTICATION REQUIRED. Provide only fields to update.',
+      '[Bookings] Update existing booking/appointment. AUTHENTICATION REQUIRED. Provide only fields to update.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -522,7 +522,7 @@ const tools: ToolDefinition[] = [
   {
     name: 'delete_booking',
     description:
-      'Delete/cancel booking/appointment. AUTHENTICATION REQUIRED.',
+      '[Bookings] Delete/cancel booking/appointment. AUTHENTICATION REQUIRED.',
     inputSchema: {
       type: 'object',
       properties: {

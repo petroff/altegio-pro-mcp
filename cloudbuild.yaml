@@ -10,11 +10,11 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server:$SHORT_SHA'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/altegio-mcp/altegio-mcp:$SHORT_SHA'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server:latest'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/altegio-mcp/altegio-mcp:latest'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server:production'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/altegio-mcp/altegio-mcp:production'
       - '.'
     id: 'build-image'
 
@@ -23,7 +23,7 @@ steps:
     args:
       - 'push'
       - '--all-tags'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/altegio-mcp/altegio-mcp'
     id: 'push-image'
     waitFor: ['build-image']
 
@@ -34,7 +34,7 @@ steps:
       - 'run'
       - 'deploy'
       - 'altegio-mcp'
-      - '--image=europe-west1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server:$SHORT_SHA'
+      - '--image=europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/altegio-mcp/altegio-mcp:$SHORT_SHA'
       - '--region=europe-west1'
       - '--platform=managed'
       - '--allow-unauthenticated'
@@ -57,9 +57,9 @@ options:
 
 # Store images
 images:
-  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server:$SHORT_SHA'
-  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server:latest'
-  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/altegio-mcp/server:production'
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/altegio-mcp/altegio-mcp:$SHORT_SHA'
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/altegio-mcp/altegio-mcp:latest'
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/altegio-mcp/altegio-mcp:production'
 
 # Timeout
 timeout: '1200s'

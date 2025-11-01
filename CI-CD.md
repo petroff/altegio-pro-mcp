@@ -1,12 +1,12 @@
 # CI/CD: Multi-Environment Deployment
 
-Automated deployment pipeline with **production** (main) and **staging** (branches) environments.
+Automated deployment pipeline with **production** (main) and **staging** (PR) environments.
 
 ## Architecture
 
 ### Production Environment
 ```
-Push to main → Cloud Build → Production
+PR merged to main → Cloud Build → Production
 Service: altegio-mcp
 Region: europe-west1
 Resources: 1Gi RAM, 2 CPU, min 1 instance
@@ -14,47 +14,63 @@ Resources: 1Gi RAM, 2 CPU, min 1 instance
 
 ### Staging Environments
 ```
-Push to any branch → Cloud Build → Staging
+PR opened/updated → GitHub Actions (quality gates) → Cloud Build → Staging
 Service: altegio-mcp-{branch-name}
 Region: europe-west1
 Resources: 512Mi RAM, 1 CPU, scale to zero
 Auto-cleanup: 3 days
 ```
 
+**Quality Gates (must pass before staging deploy):**
+- Lint + format check
+- Type check
+- Tests (all passing)
+- Build successful
+
 ## Quick Start
 
-### Deploy to Staging (Any Branch)
+### Deploy to Staging (Pull Request)
 ```bash
 git checkout -b feature/my-feature
 # ... make changes ...
 git push origin feature/my-feature
-# → Automatic staging deployment
-# → URL in build logs
+
+# Create PR via GitHub UI or CLI
+gh pr create --fill
+
+# → GitHub Actions runs quality gates
+# → If all pass: automatic staging deployment
+# → PR comment with staging URL
 ```
 
-### Deploy to Production (Main Branch)
+### Deploy to Production (Merge to Main)
 ```bash
-git checkout main
-git pull
-git merge feature/my-feature
-git push origin main
-# → Automatic production deployment
+# After PR approval and all checks pass
+gh pr merge --merge
+
+# → Automatic production deployment via Cloud Build
 ```
 
 ## Deployment Flow
 
-### 1. Staging Deployment (Feature Branches)
+### 1. Staging Deployment (Pull Requests)
 
-**Trigger:** Push to any branch except `main`
+**Trigger:** PR opened/synchronized/reopened targeting `main`
 
 **Process:**
-1. GitHub receives push
-2. Cloud Build trigger fires
-3. Builds Docker image with `staging-{SHA}` tag
-4. Sanitizes branch name (removes /, lowercase)
-5. Deploys to `altegio-mcp-{sanitized-branch}`
-6. Service scales to zero when idle
-7. Auto-deleted after 3 days
+1. GitHub Actions workflow starts
+2. **Quality Gates** (must all pass):
+   - Lint (ESLint + Prettier)
+   - Type check (TypeScript)
+   - Tests (Jest)
+   - Build (dist/)
+3. If quality gates ✅ → Trigger Cloud Build
+4. Builds Docker image with `staging-{SHA}` tag
+5. Sanitizes branch name (removes /, lowercase)
+6. Deploys to `altegio-mcp-{sanitized-branch}`
+7. Comments PR with staging URL
+8. Service scales to zero when idle
+9. Auto-deleted after 3 days
 
 **Example:**
 ```bash
@@ -73,14 +89,16 @@ git push origin main
 
 ### 2. Production Deployment (Main Branch)
 
-**Trigger:** Push to `main` branch
+**Trigger:** PR merged to `main` branch
 
 **Process:**
-1. GitHub receives push
+1. GitHub receives merge commit
 2. Cloud Build trigger fires
 3. Builds Docker image with `production`, `latest`, and `{SHA}` tags
 4. Deploys to `altegio-mcp`
 5. Always-warm instance for fast response
+
+**Note:** Direct pushes to main are blocked by branch protection rules
 
 **Config:**
 - Memory: 1Gi
@@ -157,19 +175,58 @@ gcloud run services delete altegio-mcp-feature-old \
 
 ### First-Time Setup
 
-**1. Run setup script:**
+**1. Create GitHub Secret for GCP:**
 ```bash
-./scripts/setup-triggers.sh
+# Create service account
+gcloud iam service-accounts create github-actions \
+  --display-name="GitHub Actions" \
+  --project=altegio-mcp
+
+# Grant permissions
+gcloud projects add-iam-policy-binding altegio-mcp \
+  --member="serviceAccount:github-actions@altegio-mcp.iam.gserviceaccount.com" \
+  --role="roles/cloudbuild.builds.editor"
+
+# Create key
+gcloud iam service-accounts keys create github-sa-key.json \
+  --iam-account=github-actions@altegio-mcp.iam.gserviceaccount.com
+
+# Add to GitHub Secrets:
+# Settings → Secrets → Actions → New secret
+# Name: GCP_SA_KEY
+# Value: (paste contents of github-sa-key.json)
 ```
 
-This creates:
-- Production trigger (main branch)
-- Staging trigger (all other branches)
-- Cleanup Cloud Scheduler job
-
-**2. Verify triggers:**
+**2. Create Cloud Build trigger for production:**
 ```bash
+gcloud builds triggers create github \
+  --name="altegio-mcp-production" \
+  --repo-name="altegio-pro-mcp" \
+  --repo-owner="petroff" \
+  --branch-pattern="^main$" \
+  --build-config="cloudbuild.yaml" \
+  --project="altegio-mcp"
+```
+
+**3. Create cleanup scheduler:**
+```bash
+gcloud scheduler jobs create http staging-cleanup \
+  --location=europe-west1 \
+  --schedule="0 2 * * *" \
+  --time-zone="UTC" \
+  --uri="https://cloudbuild.googleapis.com/v1/projects/altegio-mcp/builds" \
+  --http-method=POST \
+  --message-body='{"source":{"repoSource":{"projectId":"altegio-mcp","repoName":"altegio-pro-mcp","branchName":"main"}},"steps":[{"name":"gcr.io/cloud-builders/gcloud","args":["run","services","list","--filter=metadata.name~altegio-mcp-","--format=value(metadata.name,metadata.creationTimestamp)","--region=europe-west1"]}]}' \
+  --oidc-service-account-email="altegio-mcp@appspot.gserviceaccount.com"
+```
+
+**4. Verify setup:**
+```bash
+# Check trigger
 gcloud builds triggers list --project=altegio-mcp
+
+# Check GitHub Actions workflow
+gh workflow list
 ```
 
 ### Manual Setup (Alternative)
@@ -345,9 +402,10 @@ gcloud scheduler jobs run staging-cleanup \
 ## Files
 
 - `cloudbuild.yaml` - Production deployment (main branch)
-- `cloudbuild-staging.yaml` - Staging deployment (all branches)
+- `cloudbuild-staging.yaml` - Staging deployment (called by GitHub Actions)
 - `cloudbuild-cleanup.yaml` - Cleanup automation (scheduled)
-- `scripts/setup-triggers.sh` - One-time setup script
+- `.github/workflows/pr-staging.yml` - PR staging workflow (quality gates + deploy)
+- `.github/workflows/ci.yml` - CI checks for all branches
 
 ## Best Practices
 

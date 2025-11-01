@@ -18,7 +18,7 @@ steps:
       - '-c'
       - |
         # Sanitize branch name: remove special chars, lowercase, truncate
-        BRANCH_NAME="$${BRANCH_NAME:-unknown}"
+        BRANCH_NAME="$BRANCH_NAME"
         SANITIZED=$$(echo "$$BRANCH_NAME" | \
           sed 's/[^a-zA-Z0-9-]/-/g' | \
           tr '[:upper:]' '[:lower:]' | \
@@ -65,7 +65,7 @@ steps:
           --region=${_REGION} \
           --platform=managed \
           --allow-unauthenticated \
-          --set-env-vars=NODE_ENV=staging,LOG_LEVEL=debug,BRANCH_NAME=$$BRANCH_NAME \
+          --set-env-vars=NODE_ENV=staging,LOG_LEVEL=debug,BRANCH_NAME=$BRANCH_NAME \
           --update-secrets=ALTEGIO_API_TOKEN=${_SECRET_NAME}:latest \
           --memory=512Mi \
           --cpu=1 \
@@ -83,7 +83,7 @@ steps:
         echo "================================================"
         echo "✅ Staging deployment successful!"
         echo "Service: $$SERVICE_NAME"
-        echo "Branch: $$BRANCH_NAME"
+        echo "Branch: $BRANCH_NAME"
         echo "URL: $$SERVICE_URL"
         echo "Image: ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/altegio-mcp/altegio-mcp:$SHORT_SHA"
         echo "Auto-cleanup: 3 days"

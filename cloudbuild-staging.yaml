@@ -18,8 +18,7 @@ steps:
       - '-c'
       - |
         # Sanitize branch name: remove special chars, lowercase, truncate
-        BRANCH_NAME="$BRANCH_NAME"
-        SANITIZED=$$(echo "$$BRANCH_NAME" | \
+        SANITIZED=$$(echo "$BRANCH_NAME" | \
           sed 's/[^a-zA-Z0-9-]/-/g' | \
           tr '[:upper:]' '[:lower:]' | \
           cut -c1-40)

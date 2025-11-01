@@ -279,3 +279,4 @@ MIT License - see [LICENSE](LICENSE) file
 ## Acknowledgments
 
 Built with [Model Context Protocol](https://modelcontextprotocol.io) by Anthropic and [Altegio API](https://developer.alteg.io) for salon/spa management.
+# Test staging trigger

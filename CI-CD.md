@@ -14,18 +14,17 @@ Resources: 1Gi RAM, 2 CPU, min 1 instance
 
 ### Staging Environments
 ```
-PR opened/updated → GitHub Actions (quality gates) → Cloud Build → Staging
+PR opened/updated → Cloud Build Gen2 Trigger → Staging Deploy
 Service: altegio-mcp-{branch-name}
 Region: europe-west1
 Resources: 512Mi RAM, 1 CPU, scale to zero
 Auto-cleanup: 3 days
 ```
 
-**Quality Gates (must pass before staging deploy):**
-- Lint + format check
-- Type check
-- Tests (all passing)
-- Build successful
+**Configuration:**
+- Trigger: `mcp-pro-staging` (Gen2)
+- Repository: GitHub via Cloud Build 2nd gen connection
+- Comment control: Enabled for external contributors
 
 ## Quick Start
 
@@ -38,9 +37,9 @@ git push origin feature/my-feature
 # Create PR via GitHub UI or CLI
 gh pr create --fill
 
-# → GitHub Actions runs quality gates
-# → If all pass: automatic staging deployment
-# → PR comment with staging URL
+# → Cloud Build Gen2 trigger fires automatically
+# → Staging deployment starts
+# → Check status in PR checks
 ```
 
 ### Deploy to Production (Merge to Main)
@@ -55,22 +54,23 @@ gh pr merge --merge
 
 ### 1. Staging Deployment (Pull Requests)
 
-**Trigger:** PR opened/synchronized/reopened targeting `main`
+**Trigger:** PR opened/synchronized targeting `main`
+
+**Cloud Build Gen2 Trigger:** `mcp-pro-staging`
 
 **Process:**
-1. GitHub Actions workflow starts
-2. **Quality Gates** (must all pass):
-   - Lint (ESLint + Prettier)
-   - Type check (TypeScript)
-   - Tests (Jest)
-   - Build (dist/)
-3. If quality gates ✅ → Trigger Cloud Build
+1. PR created/updated on GitHub
+2. Cloud Build Gen2 trigger fires automatically
+3. Sanitizes branch name (removes /, lowercase)
 4. Builds Docker image with `staging-{SHA}` tag
-5. Sanitizes branch name (removes /, lowercase)
-6. Deploys to `altegio-mcp-{sanitized-branch}`
-7. Comments PR with staging URL
-8. Service scales to zero when idle
-9. Auto-deleted after 3 days
+5. Deploys to `altegio-mcp-{sanitized-branch}`
+6. Service scales to zero when idle
+7. Auto-deleted after 3 days
+
+**Quality Gates:**
+Separate CI workflow (`.github/workflows/ci.yml`) runs in parallel:
+- Lint, test, build
+- Doesn't block staging deployment
 
 **Example:**
 ```bash
@@ -175,58 +175,89 @@ gcloud run services delete altegio-mcp-feature-old \
 
 ### First-Time Setup
 
-**1. Create GitHub Secret for GCP:**
+**1. Create Cloud Build Gen2 Connection:**
 ```bash
-# Create service account
-gcloud iam service-accounts create github-actions \
-  --display-name="GitHub Actions" \
-  --project=altegio-mcp
+# Enable required services
+gcloud services enable cloudbuild.googleapis.com secretmanager.googleapis.com
 
-# Grant permissions
+# Grant Secret Manager permissions to Cloud Build
+gcloud projects add-iam-policy-binding altegio-mcp \
+  --member="serviceAccount:service-767969350727@gcp-sa-cloudbuild.iam.gserviceaccount.com" \
+  --role="roles/secretmanager.admin"
+
+# Create Gen2 GitHub connection
+gcloud alpha builds connections create github github-gen2 \
+  --region=europe-west1
+
+# Follow the OAuth link to authorize GitHub
+# Then add repository:
+gcloud alpha builds repositories create altegio-pro-mcp \
+  --remote-uri=https://github.com/petroff/altegio-pro-mcp.git \
+  --connection=github-gen2 \
+  --region=europe-west1
+```
+
+**2. Create Cloud Build Triggers:**
+
+Via Console (recommended):
+1. Go to: https://console.cloud.google.com/cloud-build/triggers?project=altegio-mcp
+2. **Staging Trigger:**
+   - Name: `mcp-pro-staging`
+   - Event: Pull request
+   - Repository (2nd gen): `github-gen2` / `altegio-pro-mcp`
+   - Base branch: `^main$`
+   - Build config: `cloudbuild-staging.yaml`
+   - Region: `europe-west1`
+3. **Production Trigger:**
+   - Name: `mcp-pro-production`
+   - Event: Push to branch
+   - Repository (2nd gen): `github-gen2` / `altegio-pro-mcp`
+   - Branch: `^main$`
+   - Build config: `cloudbuild.yaml`
+   - Region: `europe-west1`
+
+**3. Grant Permissions to Service Account:**
+```bash
+# Create service account for triggers
+gcloud iam service-accounts create github-actions \
+  --display-name="GitHub Actions"
+
+# Grant required permissions
 gcloud projects add-iam-policy-binding altegio-mcp \
   --member="serviceAccount:github-actions@altegio-mcp.iam.gserviceaccount.com" \
   --role="roles/cloudbuild.builds.editor"
 
-# Create key
-gcloud iam service-accounts keys create github-sa-key.json \
-  --iam-account=github-actions@altegio-mcp.iam.gserviceaccount.com
+gcloud projects add-iam-policy-binding altegio-mcp \
+  --member="serviceAccount:github-actions@altegio-mcp.iam.gserviceaccount.com" \
+  --role="roles/artifactregistry.writer"
 
-# Add to GitHub Secrets:
-# Settings → Secrets → Actions → New secret
-# Name: GCP_SA_KEY
-# Value: (paste contents of github-sa-key.json)
+gcloud projects add-iam-policy-binding altegio-mcp \
+  --member="serviceAccount:github-actions@altegio-mcp.iam.gserviceaccount.com" \
+  --role="roles/run.admin"
+
+gcloud projects add-iam-policy-binding altegio-mcp \
+  --member="serviceAccount:github-actions@altegio-mcp.iam.gserviceaccount.com" \
+  --role="roles/storage.admin"
+
+# Allow SA impersonation
+gcloud iam service-accounts add-iam-policy-binding \
+  767969350727-compute@developer.gserviceaccount.com \
+  --member="serviceAccount:github-actions@altegio-mcp.iam.gserviceaccount.com" \
+  --role="roles/iam.serviceAccountUser"
 ```
 
-**2. Create Cloud Build trigger for production:**
+**4. Verify Setup:**
 ```bash
-gcloud builds triggers create github \
-  --name="altegio-mcp-production" \
-  --repo-name="altegio-pro-mcp" \
-  --repo-owner="petroff" \
-  --branch-pattern="^main$" \
-  --build-config="cloudbuild.yaml" \
-  --project="altegio-mcp"
-```
+# Check Gen2 connection
+gcloud alpha builds connections describe github-gen2 --region=europe-west1
 
-**3. Create cleanup scheduler:**
-```bash
-gcloud scheduler jobs create http staging-cleanup \
-  --location=europe-west1 \
-  --schedule="0 2 * * *" \
-  --time-zone="UTC" \
-  --uri="https://cloudbuild.googleapis.com/v1/projects/altegio-mcp/builds" \
-  --http-method=POST \
-  --message-body='{"source":{"repoSource":{"projectId":"altegio-mcp","repoName":"altegio-pro-mcp","branchName":"main"}},"steps":[{"name":"gcr.io/cloud-builders/gcloud","args":["run","services","list","--filter=metadata.name~altegio-mcp-","--format=value(metadata.name,metadata.creationTimestamp)","--region=europe-west1"]}]}' \
-  --oidc-service-account-email="altegio-mcp@appspot.gserviceaccount.com"
-```
+# Check repositories
+gcloud alpha builds repositories list \
+  --connection=github-gen2 \
+  --region=europe-west1
 
-**4. Verify setup:**
-```bash
-# Check trigger
-gcloud builds triggers list --project=altegio-mcp
-
-# Check GitHub Actions workflow
-gh workflow list
+# Check triggers
+gcloud alpha builds triggers list --region=europe-west1
 ```
 
 ### Manual Setup (Alternative)

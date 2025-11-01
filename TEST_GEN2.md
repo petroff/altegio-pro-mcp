@@ -7,3 +7,6 @@ Expected behavior:
 - Staging service deployed: altegio-mcp-test-gen2-pr-trigger
 - No GitHub Actions workflow needed
 
+
+
+Artifact Registry permissions added.

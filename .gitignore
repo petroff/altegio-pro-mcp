@@ -53,3 +53,16 @@ api.docs/
 
 # Build output
 dist/
+
+# Temporary and backup files
+*.old
+*.bak
+*.tmp
+*~
+
+# Test scripts (use tests/ directory for real tests)
+test-*.sh
+*-test.sh
+
+# Old plan documents (keep active plans only)
+docs/plans/

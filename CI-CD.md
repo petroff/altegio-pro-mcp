@@ -89,13 +89,15 @@ Separate CI workflow (`.github/workflows/ci.yml`) runs in parallel:
 
 ### 2. Production Deployment (Main Branch)
 
-**Trigger:** PR merged to `main` branch
+**Trigger:** Push to `main` branch (after PR merge)
+
+**Cloud Build Gen2 Trigger:** `mcp-pro-production`
 
 **Process:**
-1. GitHub receives merge commit
-2. Cloud Build trigger fires
+1. PR merged to main
+2. Cloud Build Gen2 trigger fires on push
 3. Builds Docker image with `production`, `latest`, and `{SHA}` tags
-4. Deploys to `altegio-mcp`
+4. Deploys to `altegio-pro-mcp`
 5. Always-warm instance for fast response
 
 **Note:** Direct pushes to main are blocked by branch protection rules
@@ -432,29 +434,31 @@ gcloud scheduler jobs run staging-cleanup \
 
 ## Files
 
-- `cloudbuild.yaml` - Production deployment (main branch)
-- `cloudbuild-staging.yaml` - Staging deployment (called by GitHub Actions)
+- `cloudbuild.yaml` - Production deployment (Gen2 trigger on push to main)
+- `cloudbuild-staging.yaml` - Staging deployment (Gen2 trigger on PR to main)
 - `cloudbuild-cleanup.yaml` - Cleanup automation (scheduled)
-- `.github/workflows/pr-staging.yml` - PR staging workflow (quality gates + deploy)
-- `.github/workflows/ci.yml` - CI checks for all branches
+- `.github/workflows/ci.yml` - CI checks for all branches (lint, test, build)
 
 ## Best Practices
 
-1. **Test in staging first:** Always push to feature branch before merging to main
-2. **Check build logs:** Monitor Cloud Build for errors
+1. **Test in staging first:** Create PR → test staging deploy → merge to main
+2. **Check build logs:** Monitor Cloud Build console (europe-west1)
 3. **Use semantic commits:** Helps track what triggered deployments
 4. **Delete old branches:** Reduces number of staging services
 5. **Monitor costs:** Check GCP billing dashboard regularly
 
-## Migration from Old Setup
+## Architecture Summary
 
-**Old:** Single service `altegio-mcp-staging` on push to main
+**All triggers use Cloud Build 2nd gen repositories:**
+- Connection: `github-gen2` (europe-west1)
+- Repository: `altegio-pro-mcp`
+- Triggers: `mcp-pro-staging`, `mcp-pro-production`
 
-**New:**
-- Production: `altegio-mcp` (main branch)
-- Staging: `altegio-mcp-{branch}` (all branches)
-
-**No action needed:** Old service remains as production, no downtime.
+**Benefits:**
+- Native PR support (no GitHub Actions needed)
+- Regional control (europe-west1)
+- Single place for all CI/CD (Cloud Build console)
+- Better GitHub integration
 
 ---
 

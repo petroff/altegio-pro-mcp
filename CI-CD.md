@@ -9,7 +9,7 @@ Automated deployment pipeline with **production** (main) and **staging** (PR) en
 PR merged to main → Cloud Build → Production
 Service: altegio-mcp
 Region: europe-west1
-Resources: 1Gi RAM, 2 CPU, min 1 instance
+Resources: 512Mi RAM, 1 CPU, scale to zero
 ```
 
 ### Staging Environments
@@ -97,15 +97,15 @@ Separate CI workflow (`.github/workflows/ci.yml`) runs in parallel:
 1. PR merged to main
 2. Cloud Build Gen2 trigger fires on push
 3. Builds Docker image with `production`, `latest`, and `{SHA}` tags
-4. Deploys to `altegio-pro-mcp`
-5. Always-warm instance for fast response
+4. Deploys to `altegio-mcp`
+5. Scales to zero when idle for cost optimization
 
 **Note:** Direct pushes to main are blocked by branch protection rules
 
 **Config:**
-- Memory: 1Gi
-- CPU: 2
-- Min instances: 1 (always warm)
+- Memory: 512Mi
+- CPU: 1
+- Min instances: 0 (scale to zero)
 - Max instances: 10
 - Timeout: 3600s
 - Environment: NODE_ENV=production, LOG_LEVEL=info
@@ -399,8 +399,8 @@ gcloud scheduler jobs run staging-cleanup \
 ## Cost Optimization
 
 ### Production
-- **Always running:** 1 instance minimum
-- **Monthly cost:** ~$50 (1Gi RAM, 2 CPU)
+- **Scale to zero:** No cost when idle (optimized)
+- **Monthly cost:** ~$5-10 (512Mi RAM, 1 CPU, usage-based)
 
 ### Staging
 - **Scale to zero:** No cost when idle
@@ -408,8 +408,9 @@ gcloud scheduler jobs run staging-cleanup \
 - **Monthly cost:** ~$10-20 (3-5 active branches)
 
 ### Total Estimated Cost
-- **Before:** ~$50/month (single environment)
-- **After:** ~$60-70/month (production + staging)
+- **Before optimization:** ~$50/month (1Gi RAM, 2 CPU, min 1 instance)
+- **After optimization:** ~$15-30/month (512Mi RAM, 1 CPU, scale to zero)
+- **Savings:** ~$35-40/month (~70% reduction)
 
 ## Security
 
